@@ -26,26 +26,28 @@ void compress(const char* tocompress, const char* codebook){
     buffer=(char*) malloc(sizeof(char)*size);
     int bufIndex=0;
     //create the output file
-    FILE* towrite = fopen("tester.txt" , "ab+");
+    FILE* towrite = fopen("compressedfile.txt.hcz" , "ab+");
   
     while(read(fd, buffer,1)){
         //check for error
+        //find token 
         if(buffer[bufIndex]=='\n' || buffer[bufIndex]=='\t' || buffer[bufIndex]=='\r' || buffer[bufIndex]== '\v' || buffer[bufIndex]==' '){
-            char* delim=(char*) malloc(sizeof(char)*2);
+            char* delim=(char*) malloc(sizeof(char)*2); //stores the delim that ends token
             delim[0]=buffer[buffIndex];
             delim[1]='\0';
             buffer[bufIndex]='\0';
-            char* currNodeName= (char*) malloc(sizeof(char)*bufIndex+1);
+            char* currNodeName= (char*) malloc(sizeof(char)*bufIndex+1); //stores token
             strncpy(currNodeName, buffer, buffIndex+1);
             int count =0;
             for(i=0; i<buffIndex+1; i++){//getting the accumulated ascii value of the token
                 sum+=currNodeName[i];
-                count++;
+                count++; // should be the length of token??
             }
             //might have to malloc, if u do, use count ^ as length 
             char* hcode;
             char* delimcode;
-            hcode = retcode(currNodeName, codebook); 
+            //find the token in the codebook and return its code
+            hcode = retcode(currNodeName, codebook);  
             delimcode = retcode(delim, codebook);
 
              if(towrite == NULL){
@@ -53,6 +55,7 @@ void compress(const char* tocompress, const char* codebook){
                 return;
             }
             else{
+            //appends huffman code for the token and delim
                fputs(hcode, towrite); 
                fputs(delimcode, towrite);
             }

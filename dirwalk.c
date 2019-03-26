@@ -77,6 +77,8 @@ void listdir(const char* dirname){
             }
 
         }
+        free(path);
+        free(currdir_name);
     closedir(currdir);
     }
 

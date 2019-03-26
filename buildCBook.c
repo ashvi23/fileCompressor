@@ -13,15 +13,22 @@ void parseFile(char* pathName){
 	while(read(fd, buffer,1)){
 		//check for error
 		if(buffer[bufIndex]=='\n' || buffer[bufIndex]=='\t' || buffer[bufIndex]=='\r' || buffer[bufIndex]== '\v' || buffer[bufIndex]==' '){
+			char* delim=(char*) malloc(sizeof(char)*2);
+			delim[0]=buffer[buffIndex];
+			delim[1]='\0';
 			buffer[bufIndex]='\0';
 			char* currNodeName= (char*) malloc(sizeof(char)*bufIndex+1);
 			strncpy(currNodeName, buffer, buffIndex+1);
 			int i=0;
 			int sum=0;
-			for(i=0; i<buffIndex+1; i++){
-				sum+=currNodeName[];
+			int delimSum+=delim[0];
+			for(i=0; i<buffIndex+1; i++){//getting the accumulated ascii value of the token
+				sum+=currNodeName[i];
 			}
-			struct AVLNode* newNode=makeAVLNode(, char* string)
+			struct AVLNode* newNode=makeAVLNode(sum, currNodeName);
+			struct AVLNode* delimNode=makeAVLNode(delimSum, delim);
+			structAVLNode* tree=insert(newNode, sum);
+			tree=insert(delimNode, delimSum);//insert delimeter node
 			//copy val to binary tree node
 			//call fxn to add node to tree
 			//add delimeter to tree as well

@@ -17,11 +17,11 @@ void writefiles(const char* filename);
 int main (int argc, char**argv){
 
    if (is_directory(argv[1])) {
-        printf("yes\n");
+       // printf("yes\n");
         listdir(argv[1]);
     }
     else{
-        printf("no\n");
+        printf("error: no directory found\n");
     }
        
     return 0; 
@@ -59,12 +59,12 @@ void listdir(const char* dirname){
             }
             //is directory
             else if(dir_info->d_type == DT_DIR){
-                printf("in directory\n");
+                //printf("in directory\n");
                 listdir(path);
             }
             //is file
             else if(dir_info->d_type == DT_REG){
-                printf("in file\n");
+                //printf("in file\n");
                 //if contains flags, apply/call flag functions here
                 printf("path: %s\n",path);
                 openfiles(path);
@@ -84,10 +84,10 @@ void listdir(const char* dirname){
 
 }
 
-int is_directory(const char *dir) {
-    DIR *directory = opendir(dir);
-    if (directory) {
-        closedir(directory);
+int is_directory(const char *directory) {
+    DIR *direc = opendir(directory);
+    if (direc) {
+        closedir(direc);
         return 1;
     }
     else {
@@ -137,7 +137,7 @@ void writefiles(const char* filename){
         return;
     }
     else{
-        printf("in writefiles\n");
+        //printf("in writefiles\n");
         //print character by character
         char cr = fgetc(toread);
         while(cr!= EOF){
@@ -154,7 +154,7 @@ void writefiles(const char* filename){
     fclose(toread);
     fclose(towrite);
 
-    towrite = fopen("output.txt","r"); 
+   // towrite = fopen("output.txt","r"); 
   
     // Reading the string from file 
   /*  fgets(received_string,20,fp); 

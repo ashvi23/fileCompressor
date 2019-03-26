@@ -8,7 +8,7 @@
 #include <dirent.h>
 void compress(const char* tocompress, const char* codebook);
 char* retcode(char* tofind, const char* codebook);
-void tokenize(char* pathName);
+//void tokenize(char* pathName);
 
 void compress(const char* tocompress, const char* codebook){
     /*

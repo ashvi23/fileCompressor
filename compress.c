@@ -42,14 +42,19 @@ void compress(const char* tocompress, const char* codebook){
                 sum+=currNodeName[i];
                 count++;
             }
+            //might have to malloc, if u do, use count ^ as length 
             char* hcode;
+            char* delimcode;
             hcode = retcode(currNodeName, codebook); 
+            delimcode = retcode(delim, codebook);
+
              if(towrite == NULL){
                 printf("unable to create file\n");
                 return;
             }
             else{
                fputs(hcode, towrite); 
+               fputs(delimcode, towrite);
             }
 
         }

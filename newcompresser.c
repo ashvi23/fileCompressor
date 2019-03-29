@@ -13,7 +13,7 @@
 //void writefiles( char* filename);
 
 char* getNextToken(char* buffer, int size);
-void compress(char* tocompress, char* codebook);
+int compress(char* tocompress, char* codebook);
 char* retcode(char* tofind, char* codebook);
 int isFile(char *to_read) ;
 
@@ -39,6 +39,7 @@ int isFile(char *to_read) {
   }
 }
 char* getNextToken(char* buffer, int size){
+    printf("v~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~v\n");
     //printf("buffer %s\n", buffer);
     printf("sinze:%d\n", size);
     int bufIndex=0;
@@ -54,6 +55,7 @@ char* getNextToken(char* buffer, int size){
 
         if(buffer[bufIndex]=='\n' || buffer[bufIndex]==' '|| buffer[bufIndex]=='\t' || buffer[bufIndex]=='\r' || buffer[bufIndex]== '\v'){
             printf("Delim:_%s_\n", tempchar);
+            printf("^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n");
             //free(tempchar);
             return token; 
             break;   
@@ -70,29 +72,36 @@ char* getNextToken(char* buffer, int size){
     free(token);
     return "Error: Can't tokenize"; 
 }
-void compress(char* tocompress, char* codebook){
+int compress(char* tocompress, char* codebook){
     if (isFile(tocompress) == 1){
          int fd= open(tocompress, O_RDONLY);
+     
         //create the output file
-        char* filename ;
-        filename = strcat(tocompress, ".hcz");
-        printf("filename %s\n", filename );
+        int clen = strlen(tocompress)+ strlen(".hcz");
+        char* filename = (char*) malloc(clen*sizeof(char));
+        printf("int liength %d\n", clen);
+        //int ffed = strlen(filename);
+        printf("filename length= %lu\n",sizeof(filename) );
+        filename = tocompress;
+         printf("codebook: %X\n fie:%X", *codebook,*filename);
+        printf("\n\n\n file before: %s\n", filename);
+        printf("CODEBOOK before: %s\n\n", codebook);
+        strcat(filename, ".hcz");
+        printf("filename after %s\n", filename );
+         printf("CODEBOOK after: %s\n", codebook);
         int towrite = open(filename, O_CREAT | O_WRONLY | O_APPEND);
         int size=lseek(fd, 0, SEEK_END);//find the size of the string
         int l= lseek(fd, 0, SEEK_SET);
         char* buffer= NULL;
         buffer = (char*)malloc(size*sizeof(char));
         read(fd, buffer,size);
-printf("86\n\n\n");
         int totaltokcounter=0;
         int tokenlength=0;
         char* token;
         char* delim;
         char* delimcode;
         char* tokencode;
-        printf("111\n\n\n");
-        
-        printf("94\n\n\n");
+        return 0;
         while(totaltokcounter < size){
             token = getNextToken(buffer+ totaltokcounter, size - totaltokcounter);
             printf("IN COMPRESS \n\n");
@@ -127,51 +136,75 @@ printf("111\n\n\n");
             write(towrite, delimcode, strlen(delimcode));
 printf("delim: %s\n", delimcode);
             if(totaltokcounter +1 == size){
-                return;
+                return 1;
             }
         }
-
-
+free(buffer);
+free(delim);
+  //close(cb);
+    close(fd);
     }
 
  else{
         printf("Not a file\n");
-        return;
+        return -1;
     }
+
+    return 0;
 }
 
 char* retcode(char* tofind, char* codebook){
+ int cb = open(codebook, O_RDONLY);
+ printf("CODEBOOK PATH :%s\n", codebook);
 if (isFile(codebook) == 1){
-    int cb = open(codebook, O_RDWR);
+    int cb = open(codebook, O_RDONLY);
     int size=lseek(cb, 0, SEEK_END);//find the size of the file
     int l= lseek(cb, 0, SEEK_SET);
     char* buffer= NULL;
     buffer = (char*)malloc(size*sizeof(char)); //holds codebook
-    read(cb, buffer, 1);
+    read(cb, buffer, size);
     char* code;
     char* token;
     int codebookread=0;
     int tokenlength=0;
     int codelength=0;
 printf("in ret code\n");
-printf("ret code size: %d, %d", size, cb);
+printf("ret code size: %d, %d\n", size, cb);
+printf("buffer:%s\n", buffer);
+printf("what \n");
     while(codebookread < size){
+        printf("in while\n");
         code = getNextToken( buffer+codebookread, size- codebookread);
-        printf("in ret code:%s.\n",code);
+        printf("in ret code:%s)\n",code);
         codelength = strlen(code);
-        codebookread = codebookread+codelength;
+        printf("codelength: %d\n", codelength);
+        codebookread = codebookread + codelength;
+        printf("codebookread:%d\n", codebookread);
 
-        token = getNextToken( buffer+codebookread, size- codebookread);
-        printf("in ret code, %s\n",token);
+
+        token = getNextToken( buffer+codebookread, size - codebookread);
+        printf("token:%s\n",token);
         tokenlength = strlen(token);
         codebookread = codebookread+tokenlength;
+        printf("codebookread:%d\n", codebookread);
+        
+        token[tokenlength-1] = '\0' ; // delete delimiter
+        code[codelength-1] = '\0' ;
+        printf("code length after:%lu tokenlength after: %lu ~ ~\n", strlen(code), strlen(token));
 
-        token[tokenlength] = '\0'; // delete delimiter
-        code[codelength] = '\0';
+       // printf("tokenlength after: %lu_%c_ codelength after:%lu_%c_\n", strlen(token), token[tokenlength+1], strlen(code), code[codelength+1] );
+        printf("TO FIND:%s.  token: %s\n", tofind, token);
+        printf("COMPARED: %d\n",strcmp(tofind, token) );
         if(strcmp(tofind, token) ==0 ){
+            printf("returning: %s for token:%s\n", code, token );
             return code;
         }
+        if(codebookread+1 == size){
+printf("reached size\n");
+            break;
+        }
         else{
+            printf("\n\n\n\n\n\n");
             continue;
         }
 
@@ -298,9 +331,14 @@ return 0;
 }
 */
 int main (int argc, char**argv){
-    printf("Argv[2] %s\n",  argv[2]);
-    compress(argv[1], argv[2]);
 
+    //printf("Argv[2] %s\n",  argv[2]);
+    //int sf = strlen(argv[2]);
+   // char* send =(char*) malloc(sf*sizeof(char));
+    //compress(argv[1], send);
+    getNextToken("  i", 8);
+    retcode("button", argv[1]);
+//free(send);
        
     return 0; 
     }

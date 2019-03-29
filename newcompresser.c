@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <ctype.h>
 
 //void listdir(const char* dirname, const char* codebook);
 //void openfiles(const char* filename);
@@ -29,19 +30,19 @@ int isFile(char *to_read) {
       return 1;
     } else {
       printf("Error, not found\n");
-      return -1;
+      return -7;
     }
 
   } else {
 
 
-    return -1;
+    return -6;
   }
 }
 char* getNextToken(char* buffer, int size){
     printf("v~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~v\n");
     //printf("buffer %s\n", buffer);
-    printf("getnexttoken size:%d\n", size);
+    printf("getnexttoken size:%d\nSTRING:%s", size, buffer);
     int bufIndex=0;
     char* token = (char*) malloc(size+1* sizeof(char));
     char* tempchar = (char*) malloc(2* sizeof(char));
@@ -70,7 +71,8 @@ char* getNextToken(char* buffer, int size){
         bufIndex++;
     }
     free(token);
-    return "Error: Can't tokenize"; 
+
+    return "-5"; 
 }
 int compress(char* tocompress, char* codebook){
     if (isFile(tocompress) == 1){
@@ -117,7 +119,11 @@ int compress(char* tocompress, char* codebook){
             if(tokenlength == 1){
                 delim[0] = token[0];
 // if is char or if is cntrl token[0]
+                if(iscntrl(token[tokenlength]) > 0){
                 token[tokenlength-1] = '\0';
+                printf("tCOMPRESS TOKEN:%s*\n", token);
+                }
+                //token[tokenlength-1] = '\0';
                 delim[1] = '\0';
             }
        // printf("104\n\n\n");
@@ -162,7 +168,7 @@ free(delim);
 
  else{
         printf("Not a file\n");
-        return -1;
+        return -4;
     }
 
     return 0;
@@ -188,10 +194,15 @@ printf("ret code size: %d, %d\n", size, cb);
 printf("buffer:%s\n", buffer);
 printf("what \n");
 int tofindlen = strlen(tofind);
-if(tofindlen == 1){
-    tofind[tofindlen] = '\0';
+printf("TOFIND BEFORE%s\n", tofind );
+if(iscntrl(tofind[tofindlen]) > 0 && tofind[tofindlen]!= '\0'){
+    printf("word:%s___len:%d___char:%c_\n", tofind, tofindlen, tofind[tofindlen]);
+    tofind[tofindlen-1] = '\0';
+   printf("AFTER MESS word:%s___len:%d___char:%c_\n", tofind, tofindlen, tofind[tofindlen]);
 }
+
     while(codebookread < size){
+         printf("to find afterWHILE:%s*\n", tofind);
         printf("in while\n");
         code = getNextToken( buffer+codebookread, size- codebookread);
         printf("in ret code:%s)\n",code);
@@ -218,9 +229,9 @@ if(tofindlen == 1){
             printf("returning: %s for token:%s\n", code, token );
             return code;
         }
-        if(codebookread == size){
+        else if(codebookread == size){
 printf("reached size\n");
-            return "-1";
+            return "-2";
         }
         else{
             printf("\n\n\n\n\n\n");
@@ -230,7 +241,7 @@ printf("reached size\n");
 
     }
     printf("Errors: Code not found\n");
-    return "-1";
+    return "-3";
 }
 else{
    return "Not a file\n";

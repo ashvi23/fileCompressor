@@ -43,6 +43,9 @@ char* getNextToken(char* buffer, int size){
     printf("v~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~v\n");
     //printf("buffer %s\n", buffer);
     printf("getnexttoken size:%d\nSTRING:%s", size, buffer);
+    if(size ==0){
+        return "-5";
+    }
     int bufIndex=0;
     char* token = (char*) malloc(size+1* sizeof(char));
     char* tempchar = (char*) malloc(2* sizeof(char));
@@ -51,10 +54,10 @@ char* getNextToken(char* buffer, int size){
         tempchar[0] = buffer[bufIndex];
         tempchar[1] = '\0';
         strcat(token, tempchar);
-        printf("Token: %s\n", token);
-        printf("index:%d\n", bufIndex);
+        //printf("Token: %s\n", token);
+        //printf("index:%d\n", bufIndex);
 
-        if(buffer[bufIndex]=='\n' || buffer[bufIndex]==' '|| buffer[bufIndex]=='\t' || buffer[bufIndex]=='\r' || buffer[bufIndex]== '\v'){
+        if( buffer[bufIndex]==' '|| iscntrl( buffer[bufIndex])>0) {
             printf("Delim:_%s_\n", tempchar);
             printf("^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ \n");
             //free(tempchar);
@@ -110,52 +113,60 @@ int compress(char* tocompress, char* codebook){
         char* tokencode;
         //return 0;
         while(totaltokcounter < size){
+            if(totaltokcounter+1  == size){
+  
+free(buffer);
+free(delim);
+                return 1;
+            }
+            printf("Compress: String sent in:%s]\n", buffer+totaltokcounter);
             token = getNextToken(buffer+ totaltokcounter, size - totaltokcounter);
             printf("IN COMPRESS \n\n");
             tokenlength = strlen(token);
             totaltokcounter = totaltokcounter + tokenlength;
-            printf("99\n\n\n");
+           // printf("99\n\n\n");
             delim = (char*) malloc(2 * sizeof(char));
             if(tokenlength == 1){
                 delim[0] = token[0];
 // if is char or if is cntrl token[0]
-                if(iscntrl(token[tokenlength]) > 0){
+                if(iscntrl(token[tokenlength]) > 0 || token[tokenlength] == ' '){
                 token[tokenlength-1] = '\0';
-                printf("tCOMPRESS TOKEN:%s*\n", token);
+                printf("COMPRESS TOKEN:%s*\n", token);
                 }
                 //token[tokenlength-1] = '\0';
                 delim[1] = '\0';
             }
        // printf("104\n\n\n");
             else if(tokenlength >1){
-                if(token[tokenlength]=='\n' || token[tokenlength]==' '|| token[tokenlength]=='\t' || token[tokenlength]=='\r' || token[tokenlength]== '\v' ){
+                if(iscntrl(token[tokenlength]) >0||token[tokenlength] == ' ' ){
                     delim[0] = token[tokenlength];
                     delim[1] = '\0';
                     token[tokenlength] = '\0';
                     printf("Token:%s \n", token);
                 }
             }
-printf("111\n\n\n");
+//printf("111\n\n\n");
             
+            if(strcmp(delimcode, "-5") !=0){
             if(tokenlength > 1){
                 tokencode = retcode(token, codebook);
                 printf("token: %s\n", tokencode);
-
+                if(strcmp(tokencode,"-2") !=0 ){
                 write(towrite, tokencode, strlen(tokencode));
             }
-        printf("120\n\n\n");
+            }
+        }
+      //  printf("120\n\n\n");
+            if(strcmp(delimcode, "-5") !=0){
             delimcode = retcode(delim, codebook);
+             if(strcmp(tokencode,"-2") !=0){
             write(towrite, delimcode, strlen(delimcode));
-printf("delim: %s\n", delimcode);
-            if(totaltokcounter  == size){
-                int s = open(filename, O_RDONLY);
-                int size2=lseek(fd, 0, SEEK_END);//find the size of the string
-        int l2= lseek(fd, 0, SEEK_SET);
-        char* buffer2= NULL;
-        buffer2 = (char*)malloc(size2*sizeof(char));
-        read(s, buffer2,size2);
+            }
+        }
 
-        printf("\n\n\n\n\n\nBUFFER1:%s\nBUFFER:%s\n\n\n\n\n", buffer, buffer2);
+printf("delim: %s\n", delimcode);
+            if(totaltokcounter+1  == size){
+  
 free(buffer);
 free(delim);
                 return 1;
@@ -201,9 +212,19 @@ if(iscntrl(tofind[tofindlen]) > 0 && tofind[tofindlen]!= '\0'){
    printf("AFTER MESS word:%s___len:%d___char:%c_\n", tofind, tofindlen, tofind[tofindlen]);
 }
 
+ printf("wor 2 d:%s___len:%d___char:%c_\n", tofind, tofindlen, tofind[tofindlen]);
+if(tofind[tofindlen-1]== ' ' && tofindlen>1){
+      printf("wor 2 d:%s___len:%d___char:%c_\n", tofind, tofindlen, tofind[tofindlen]);
+    tofind[tofindlen-1] = '\0';
+    printf("AFTER MESS word:%s___len:%d___char:%c_\n", tofind, tofindlen, tofind[tofindlen]);
+
+}
+
+
+//}
+
     while(codebookread < size){
          printf("to find afterWHILE:%s*\n", tofind);
-        printf("in while\n");
         code = getNextToken( buffer+codebookread, size- codebookread);
         printf("in ret code:%s)\n",code);
         codelength = strlen(code);
@@ -223,13 +244,13 @@ if(iscntrl(tofind[tofindlen]) > 0 && tofind[tofindlen]!= '\0'){
         printf("code length after:%lu tokenlength after: %lu ~ ~\n", strlen(code), strlen(token));
 
        // printf("tokenlength after: %lu_%c_ codelength after:%lu_%c_\n", strlen(token), token[tokenlength+1], strlen(code), code[codelength+1] );
-        printf("TO FIND:[%s]  token:[%s/\n", tofind, token);
+        printf("TO FIND:[%s] tofindlen:[%c]  token:[%s/\n", tofind, tofind[tofindlen-1], token);
         printf("COMPARED: %d\n",strcmp(tofind, token) );
         if(strcmp(tofind, token) ==0 ){
             printf("returning: %s for token:%s\n", code, token );
             return code;
         }
-        else if(codebookread == size){
+        if(codebookread+1 == size && strcmp(tofind, token) !=0){
 printf("reached size\n");
             return "-2";
         }
@@ -248,7 +269,21 @@ else{
     
 }
 }
-/*
+int main (int argc, char**argv){
+
+    //printf("Argv[2] %s\n",  argv[2]);
+    int sf = strlen(argv[2]);
+    char* send =(char*) malloc(sf*sizeof(char));
+     int df = strlen(argv[1]);
+    char* send1 =(char*) malloc(df*sizeof(char));
+    compress(argv[1], argv[2]);
+   // getNextToken("  i", 8);
+   // retcode("button", argv[1]);
+//free(send);
+       
+    return 0; 
+    }
+    /*
 void compress(char* tocompress, const char* codebook){
     //FILE* tc = fopen(tocompress);
     if(isFile(tocompress) == 1){
@@ -361,18 +396,4 @@ close(cb);
 return 0;
 }
 */
-int main (int argc, char**argv){
-
-    //printf("Argv[2] %s\n",  argv[2]);
-    int sf = strlen(argv[2]);
-    char* send =(char*) malloc(sf*sizeof(char));
-     int df = strlen(argv[1]);
-    char* send1 =(char*) malloc(df*sizeof(char));
-    compress(argv[1], argv[2]);
-   // getNextToken("  i", 8);
-   // retcode("button", argv[1]);
-//free(send);
-       
-    return 0; 
-    }
         

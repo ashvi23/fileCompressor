@@ -1,0 +1,42 @@
+get next token: 
+- takes in path to the file to parse
+- size of the whole file minus stuff you've already read 
+- offset -> what byte to start reading from
+
+returns: token+delimiter
+ex: [and	] (nul terminated)
+if multiple delimiters in row then returns:
+[	] (\t\0)
+
+keep track of bytesread
+	token = getnexttoken(path, sizeoffile - bytesread, bytesread)
+	toklen = strlen token
+	bytesread += toklen
+
+extraction:
+	malloc delim
+
+	delimiter -> token[toklen-1]
+	nul terminator= token[toklen]
+
+	if toklen > 1
+	delim[0] = token[toklen-1]
+	token[toklen-1] = '\0'  // gets rid of the delimiter and gives you just your token
+
+	dont forget to check for errors from getnexttoken strcmp token "3"
+
+codebook: 
+getnexttoken -> ^%
+
+while(){
+	
+	code = getnexttoken
+	extract tab
+
+	word = getnexttoken
+	extract newline
+
+	//strcat(code, word)
+
+}
+

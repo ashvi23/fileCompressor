@@ -240,6 +240,7 @@ void decompress( char* compressed, char* codebook){
   printf("Compressed: %s\n",compressed);
   printf("Codebook: %s\n",codebook);
 	//WOULD REALISTICALLY HAVE TO SEARCH FOR CODEBOOK IN DIRECTORY, NEED ALGO FOR THAT
+	
 	struct HeapNode* head= treeFromCBook( head, codebook); // ????needs head
 	struct HeapNode* ptr=NULL;
 	ptr=head;
@@ -251,6 +252,10 @@ void decompress( char* compressed, char* codebook){
 	int clen = strlen(compressed);
 	clen = clen - 4; // subtract ".hcz"
 	char* decompressed = (char*) malloc(clen*sizeof(char));
+	if(decompressed == NULL){
+	printf("malloc error in decompress\n");
+	return;
+	}
 	decompressed[0] = '\0';
 	
 	strncpy(decompressed, compressed, clen);

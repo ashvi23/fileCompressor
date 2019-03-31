@@ -38,7 +38,7 @@ int main(int argc, char** argv){
 	struct HeapNode* sortedArr=(struct HeapNode*) malloc(sizeof(struct HeapNode)*6);
 	char string1[3];
 	string1[0]='\0';
-	strcat(string1, '\n');
+	strcat(string1, "\n");
 	//string1[1]='\0';
 	sortedArr[0].name=string1;
 	sortedArr[0].frequency=11;
@@ -46,34 +46,34 @@ int main(int argc, char** argv){
 
 	char string2[3];
 	string2[0]='\0';
-	strcat(string2, '\r');
+	strcat(string2, "\r");
 	//string2[1]='\0';
 	sortedArr[1].name=string2;
 	sortedArr[1].frequency=12;
 	
 	char string3[3];
 	string3[0]	='\0';
-	strcat(string3, '\0');
+	strcat(string3, "\0");
 	//string3[1]='\0';
 	sortedArr[2].name=string3;
 	sortedArr[2].frequency=13;
 	
 	char string4[3];
 	string4[0]	='\0';
-	strcat(string4, '\t');
+	strcat(string4, "\t");
 	//string4[1]='\0';
 	sortedArr[3].name=string4;
 	sortedArr[3].frequency=14;
 	
 	char string5[3];
 	string5[0]	='\0';
-	strcat(string5, ' ');
+	strcat(string5, " ");
 	//string5[1]='\0';
 	sortedArr[4].name=string5;
 	sortedArr[4].frequency=24;
 
 	char string6[3];
-	strcat(string6, '\v');
+	strcat(string6, "\v");
 	//string6[1]='\0';
 	sortedArr[5].name=string6;
 	sortedArr[5].frequency=26;
@@ -160,7 +160,7 @@ void traverseTree(struct HeapNode* root,char path[], int index, int filedesc, in
 			//when you get to the leaf node, print a space and then the name contained in that node
 			write(filedesc, path, index);
 			write(filedesc, "\t",1);
-			printf("root->name, %s", );
+			printf("root->name, %s",root->name );
 			int currTokLen=strlen(root->name);
 			if(root->name[0]=='\n'){//writing escape characters to file
 				if(write(filedesc, "^%n", currTokLen+2)!=(currTokLen+2)){
@@ -373,26 +373,7 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 
 
 }
-				
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+			
 
 			/*if((index<size)){//if there are at least 2 vals in both arr and LL 
 				printf("LL is smaller\n");

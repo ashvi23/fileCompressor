@@ -361,7 +361,6 @@ struct LLNode* makeNode(struct LLNode* newNode, struct HeapNode* tree){
 	newNode=(struct LLNode*)malloc(1*sizeof(struct LLNode));
 	newNode->Tree=tree;
 	newNode->next=NULL;
-	newNode->height=1;
 	return newNode;
 	}
 
@@ -553,5 +552,6 @@ struct HeapNode* makeHeapNode(struct HeapNode* node, int freq, char* token){
 	node->frequency=freq;
 	node->left=NULL;
 	node->right=NULL;
+	newNode->height=1;
 	return node;
 }

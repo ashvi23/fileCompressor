@@ -1,14 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+//keep track of the number of words added to hahstable accross all files
 struct HashNode{
 	char* token;
 	int key;
 	int frequency;
 	struct HashNode* next;
 };
-
-
 
 struct HashNode* makeHashNode(char* string);
 int getKey(char* string);
@@ -108,10 +107,10 @@ int seek(struct HashNode** HashTable,char* string){
 	printf("key: %d\n", key);
 	struct HashNode *temp=HashTable[key];
 		while(temp!=NULL){
-			printf("temp->token: %s\n", temp->token);
+			//printf("temp->token: %s\n", temp->token);
 			if(strncmp(temp->token, string, strlen(string+1))==0){
 			temp->frequency++;
-			printf("duplicate found: %s, frequency: %d\n", temp->token, temp->frequency);
+			//printf("duplicate found: %s, frequency: %d\n", temp->token, temp->frequency);
 			absent=0;
 			}
 		temp=temp->next;

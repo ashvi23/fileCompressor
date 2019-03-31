@@ -9,7 +9,7 @@
 //#include <limits.h>
 
 /* List the files in "dir_name". */
-void listdir(const char* dirname);
+void listdir(int flag, const char* dirname);
 void openfiles(const char* filename);
 int is_directory(const char *dir);
 void writefiles(const char* filename);
@@ -27,7 +27,7 @@ int main (int argc, char**argv){
     return 0; 
     }
 
-void listdir(const char* dirname){
+void listdir(int flag, const char* dirname){
 	DIR* currdir = opendir(dirname);
     struct dirent *dir_info;
     if(!currdir){
@@ -43,11 +43,19 @@ void listdir(const char* dirname){
 
             int dirname_len = strlen(dirname);
             int currdir_len = strlen(dir_info->d_name);
-            char* currdir_name = (char*) malloc(currdir_len);
+            char* currdir_name = (char*) malloc(currdir_len*sizeof(char));
+            if(currdir_name == NULL){
+            printf("malloc failed in directory walk \n");
+            return;
+            }
             currdir_name = dir_info->d_name;
 
             // + '/' + '\0'
-            char* path = (char*) malloc(dirname_len+currdir_len+2);
+            char* path = (char*) malloc(dirname_len+currdir_len+2 *sizeof(char));
+             if(currdir_name == NULL){
+            printf("malloc failed in directory walk \n");
+            return;
+            }
             memcpy(path, dirname, dirname_len);
             memcpy(path+dirname_len , "/", 1);
             memcpy(path+dirname_len+1 , currdir_name, currdir_len+1);
@@ -66,20 +74,24 @@ void listdir(const char* dirname){
             else if(dir_info->d_type == DT_REG){
                 //printf("in file\n");
                 //if contains flags, apply/call flag functions here
-                printf("path: %s\n",path);
-                openfiles(path);
-                writefiles(path);
+                //printf("path: %s\n",path);
+				
+				if(flag == 2){
+				compress(path, codebook);
+				}
+				if(flag == 3){
+				}
             }
             //error check
             else if(dir_info->d_type == DT_UNKNOWN){
                 printf("Error: Directory type is unknown\n");
                 return;
             }
-
+		//free(path);
+        //free(currdir_name);
+    	
         }
-        free(path);
-        free(currdir_name);
-    closedir(currdir);
+       closedir(currdir);
     }
 
 }
@@ -208,3 +220,4 @@ void listdir(* dr){
     return;
 }
 */
+

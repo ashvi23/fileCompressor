@@ -75,8 +75,8 @@ char* getNextToken(char* filename, int size, int offset){
         }
 int tempcharint = tempchar[0];
         if( tempchar[0]==' '|| iscntrl( tempchar[0])>0) {
-            printf("GNT Token:[%s] ",token );
-            printf("GNT Delim:_%s_\n", tempchar);
+            //printf("GNT Token:[%s] ",token );
+            //printf("GNT Delim:_%s_\n", tempchar);
           
             //free(tempchar);
             //free(temp);
@@ -119,10 +119,7 @@ int compress(char* tocompress, char* codebook){
         int towrite = open(filename, O_CREAT | O_RDWR | O_APPEND);
         int size=lseek(fd, 0, SEEK_END);//find the size of the string
         int l= lseek(fd, 0, SEEK_SET);
-        char* buffer = (char*) malloc(size);
-    read(fd, buffer,size); 
-    printf("C BUFFER:[%s]((((((())))))))))))) \n", buffer);
-    int t= lseek(fd, 0, SEEK_SET);
+	    
         int totaltokcounter=0;
         int tokenlength=0;
         //char* token;
@@ -131,7 +128,7 @@ int compress(char* tocompress, char* codebook){
         //char* tokencode;
 
         while(totaltokcounter < size){
-printf("STARTING COMPRESS \n\n");
+//printf("STARTING COMPRESS \n\n");
             if(totaltokcounter+1  == size){
                 close(fd);
                 free(delim);
@@ -145,7 +142,7 @@ printf("STARTING COMPRESS \n\n");
             }
             tokenlength = strlen(token);
             totaltokcounter = totaltokcounter + tokenlength;
-            printf("C token:[%s] COUNTER:%d\n\n", token, totaltokcounter);
+            //printf("C token:[%s] COUNTER:%d\n\n", token, totaltokcounter);
             delim = (char*) malloc(2 * sizeof(char));
 			if(delim == NULL){
 			printf("Error: Malloc returned NULL\n");
@@ -153,18 +150,18 @@ printf("STARTING COMPRESS \n\n");
 			return 0;
 			}
             //token is a delimiter --> no letters. null [len]/[1] & cntrlcode [len-1] /[0]
-            printf("the token:[%s]\n",token );
+            //printf("the token:[%s]\n",token );
             if(tokenlength == 1){
                 delim[0] = token[0];
 // if is char or if is cntrl token[0]
                 if(iscntrl(token[tokenlength-1]) > 0 || token[tokenlength-1] == ' '){
                 token[tokenlength] = '\0';
-                printf("COMPRESS TOKEN:[%s]\n", token);
+                //printf("COMPRESS TOKEN:[%s]\n", token);
                 }
                 //token[tokenlength-1] = '\0';
                 delim[1] = '\0';
             }
-printf("111\n\n\n");
+
             //contains at least 1 letter/non delimiter 
             // delimiter[len-1] 
             if(tokenlength >1){
@@ -176,15 +173,15 @@ printf("111\n\n\n");
                 }
 
             }
-            printf("C token:[%s] delim:[%d] totaltokcounter:%d size:%d\n",token, delim[0], totaltokcounter, size );
-//printf("111\n\n\n");
-            printf("C token:[%s] delim:[%s]\n", token, delim );
+           // printf("C token:[%s] delim:[%d] totaltokcounter:%d size:%d\n",token, delim[0], totaltokcounter, size );
+
+           // printf("C token:[%s] delim:[%s]\n", token, delim );
             if(strcmp(token, "3") !=0){
                 if(tokenlength > 1){
                     char* tokencode = retcode(token, codebook);
                     //printf("C token:[%s]\n", tokencode);
                     if(strcmp(tokencode,"3") !=0 ){
-                        printf("C Towrite- tokencode:[%s] for token:[%s]\n",tokencode, token);
+                       // printf("C Towrite- tokencode:[%s] for token:[%s]\n",tokencode, token);
                         write(towrite, tokencode, strlen(tokencode));
                     }
                     else if(strcmp(tokencode,"3") ==0){
@@ -195,23 +192,23 @@ printf("111\n\n\n");
                 }
         }
       // printf("120\n\n\n");
-        printf("Now finding delim code\n");
+       // printf("Now finding delim code\n");
 
             if(strcmp(delim, "3") !=0 && (iscntrl(delim[0])>0 || delim[0]==' ') ){
                 char* delimcode = retcode(delim, codebook);
                 if(strcmp(delimcode,"3") !=0){
-                    printf("C Towrite- delim: %s for delim:[%s]\n", delimcode, delim);
+                  //  printf("C Towrite- delim: %s for delim:[%s]\n", delimcode, delim);
                     write(towrite, delimcode, strlen(delimcode));
                 }
                 else if(strcmp(delimcode,"3") ==0){
-                	printf("Error: Token %s doesn't exist in codebook\n", delim);
+                	//printf("Error: Token %s doesn't exist in codebook\n", delim);
                 	remove(filename);
                 	return 0;
                 	}
             }
 
             
-            printf("C tokencode delimcode completed\n" );
+           // printf("C tokencode delimcode completed\n" );
 
             if(totaltokcounter+1  == size){
      
@@ -245,7 +242,7 @@ char* retcode(char* tofind, char* codebook){
     int l= lseek(cb, 0, SEEK_SET);
     char* buffer = (char*) malloc(size);
     read(cb, buffer,size);
-     printf("RC BUFFER:[%s]############################### \n", buffer); 
+    // printf("RC BUFFER:[%s]############################### \n", buffer); 
     int t= lseek(cb, 0, SEEK_SET);
     char* code;  // holds huffman code
     char* token; //holds word
@@ -272,7 +269,7 @@ return "3";
 }
 key = getNextToken(codebook, size - codebookread , codebookread);
 codebookread = codebookread + (strlen(key));
-printf("Key: %s CodebookR: %d \n", key, codebookread);
+//printf("Key: %s CodebookR: %d \n", key, codebookread);
 int cntrl=0;
 if(iscntrl(tofind[0]) >0 || tofind[0] == ' '){
 	cntrl = 1;
@@ -280,11 +277,11 @@ if(iscntrl(tofind[0]) >0 || tofind[0] == ' '){
     //size is the bytes in the codebook
      while(codebookread < size){
         //int tfint = tofind[0];
-        printf("RC: To Find:[%d]\n", tofind[0]);
+        //printf("RC: To Find:[%d]\n", tofind[0]);
         code = getNextToken(codebook, size - codebookread , codebookread);
         codelength = strlen(code);
         codebookread = codebookread + codelength;
-        printf("RC code:[%s]\n",code);
+       // printf("RC code:[%s]\n",code);
 
         if(strcmp(code, "3")==0){
             printf("Error: Could not retrieve code in HuffmanCodebook at offset:%d \n", codebookread);
@@ -306,7 +303,7 @@ if(iscntrl(tofind[0]) >0 || tofind[0] == ' '){
             	int ctf = itf;
             	
             	//int itok = ctok;
-            	printf("CONTROL: %c %d \n",  itf, ctf);
+            	//printf("CONTROL: %c %d \n",  itf, ctf);
             	if((ctf== 32 && token[2] == 'w')||(ctf== 9 && token[2] == 't')||(ctf== 10 && token[2] == 'n')||(ctf== 0 && token[2] == '0')||(ctf== 11 && token[2] == 'v') ||(ctf== 12 && token[2] == 'f')||ctf== 13 && token[2] == 'r'||ctf== 7 && token[2] == 'a'||ctf== 8 && token[2] == 'b'||ctf== 27 && token[2] == 'e'){
             		return code;
             	}
@@ -333,12 +330,12 @@ if(iscntrl(tofind[0]) >0 || tofind[0] == ' '){
         }
         printf("247\n");
         if(strcmp(tofind, token) ==0 ){
-            printf("RC Returning Code:%s\n", code );
+            //printf("RC Returning Code:%s\n", code );
             return code;
         }
         printf("248\n");
         if(codebookread+1 == size && strcmp(tofind, token) !=0){
-            printf("RC reached size\n");
+            //printf("RC reached size\n");
             return "3";
         }
         else{

@@ -96,6 +96,7 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 	while(index<=(numToks-1) || LLptr->next!=NULL){
 		printf("\n********************index: %d*************************\n", index);
 		LLptr=head;//reset ptr to current head of LL 
+		printf("\nhead->Tree->name: %s\n", LLptr->Tree->name);
 		if((sortedArr[index].frequency) <= (LLptr->Tree->frequency)){//if value in arr is smaller than val in LL
 			printf("Array is smaller\n");
 			if((index<size)){//if there are at least 2 vals in both arr and LL: && LLptr->next!=NULL 
@@ -140,6 +141,7 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 					delete(&LLptr, (LLptr->Tree->name));//delete LLNode used
 					printf("\nAfter deletions:\n");
 					printLL(LLptr);	
+					printf("\nReturned\n");
 				}
 				else if((index+1>=size)|| LLptr->next->Tree->frequency <= sortedArr[index].frequency){
 					printf("Next LL is smaller\n");
@@ -159,10 +161,10 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 			}
 		}
 		
-		if(head->next==NULL){
+		/*if(head->next==NULL && index>=size){
 			break;//done
-		}
-		
+		}*/
+		printf("\nDONE\n");
 	}
 	return LLptr->Tree;
 	
@@ -193,9 +195,17 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 		append to end of LL (or use insertion sort if absolutely necessary)*/
 }
 struct HeapNode* makeTree(struct HeapNode* head, struct HeapNode* smaller, struct HeapNode* larger){
+		printf("IN MAKETREE\n\n");
 		head=(struct HeapNode*)malloc(1*sizeof(struct HeapNode));
 		head->frequency= (smaller->frequency)+(larger->frequency);
-		head->name=smaller->name;
+		int sumNames=strlen(smaller->name)+strlen(larger->name);
+		printf("sumNames:%d\n\n", sumNames);
+		char* headName= (char*)malloc(sizeof(char)*(sumNames+1));
+		headName[0]='\0';
+		strcat(headName,larger->name);
+		strcat(headName,smaller->name);
+		printf("HELLO\n\n");
+		head->name=headName;
 		head->left=smaller;
 		head->right=larger;
 		return head;
@@ -275,23 +285,26 @@ struct LLNode *node= NULL;
 //to delete a node in the LL
 void delete(struct LLNode **head, char* Name){
 	struct LLNode *temp1=(*head);
-		printf("hello!\n");
-
-		printf("hello hello\n");
 		if((*head)==NULL){
 			//printf("hello 2!\n");
 			return;
 		}
 		else if((*head)->next==NULL && strcmp((*head)->Tree->name,Name)==0){
 				(*head)=(*head)->next;
+				free(temp1);
 			}
 			else if((*head)->next!=NULL){
 				//printf("hello hello!\n");
 				struct LLNode *temp2=(*head)->next;
 				while(temp1!=NULL){
+					printf("\nName: %s\n", Name);
 					if(strcmp((*head)->Tree->name, Name)==0){
-						//printf("head to be deleted");
+						printf("head to be deleted\n");
 						(*head)=(*head)->next;
+						free(temp1);
+						
+						printf("name of head->next:%s\n\n\n", (*head)->Tree->name);
+						return;
 						}
 					else if(temp2==NULL){
 						break;
@@ -308,19 +321,24 @@ void delete(struct LLNode **head, char* Name){
 						else{
 							//printf("deleted\n");
 							temp1->next=temp2->next;// all other cases
-						}
-						if(temp2==NULL){
-							//printf("temp 2 is NULL\n");
 							free(temp2);
-							break;// if the last node in the LL got deleted
-						}		
+							return;
+						}
+		
 					}
 					//printf("about to increment\n");
+					if(temp1->next!=NULL){
 					temp1=temp1->next;
+					}
+					else{
+						return;
+					}
 					printf("temp1: %s\n", temp1->Tree->name);
-					printf("temp2: %s\n", temp2->Tree->name);
+					
 					//printf("incremented 1\n");
-					temp2=temp2->next;
+					if(temp2->next!=NULL){
+						temp2=temp2->next;
+						}
 					printf("temp2: %s\n", temp2->Tree->name);
 					//printf("incremented 2\n");
 				}
@@ -336,6 +354,8 @@ void delete(struct LLNode **head, char* Name){
 void printLL(struct LLNode *head){
 int counter=0;
 int data;
+printf("\nprinting\n");
+printf("%s\n", head->Tree->name);
 struct LLNode *temp1=head;
 	if(temp1==NULL){
 		printf("0");
@@ -350,14 +370,13 @@ struct LLNode *temp1=head;
 	temp1=head;
 	while(temp1!=NULL){
 		data=temp1->Tree->frequency;
+		//printf("data:%d\n", data);
 			if(temp1->next==NULL){
-				//printf("what");
-				printf("%d",data);
+				printf("%s, %d\n",temp1->Tree->name, data);
 				return;	
 			}
 			else{ 	
-				//printf("the fuck");
-				printf("%d\t",data);
+				printf("%s, %d    \t\n",temp1->Tree->name, data);
 				temp1=temp1->next;
 			}
 	}

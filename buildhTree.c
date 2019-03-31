@@ -21,6 +21,7 @@ struct HeapNode* makeHeapNode(struct HeapNode* node, int freq, char* token);
 void delete(struct LLNode **head, char* Name);
 void insert(struct LLNode **head, struct HeapNode **tree, int freq);
 void freeNodes(struct LLNode *head);
+void printTree(struct HeapNode* node);
 void printLL(struct LLNode *head);
 
 int main(int argc, char** argv){
@@ -29,32 +30,43 @@ int main(int argc, char** argv){
 	string1[6]='\0';
 	sortedArr[0].name=string1;
 	sortedArr[0].frequency=11;
-
+	sortedArr[0].left=NULL;
+	sortedArr[0].right=NULL;
 
 	char string2[7]="gargle";
 	string2[6]='\0';
 	sortedArr[1].name=string2;
 	sortedArr[1].frequency=12;
+	sortedArr[1].left=NULL;
+	sortedArr[1].right=NULL;
 	
 	char string3[10]="hankering";
 	string3[9]='\0';
 	sortedArr[2].name=string3;
 	sortedArr[2].frequency=13;
+	sortedArr[2].left=NULL;
+	sortedArr[2].right=NULL;
 	
 	char string4[9]="nudniker";
 	string4[8]='\0';
 	sortedArr[3].name=string4;
 	sortedArr[3].frequency=14;
+	sortedArr[3].left=NULL;
+	sortedArr[3].right=NULL;
 	
 	char string5[8]="shmates";
 	string5[7]='\0';
 	sortedArr[4].name=string5;
 	sortedArr[4].frequency=24;
+	sortedArr[4].left=NULL;
+	sortedArr[4].right=NULL;
 
 	char string6[10]="editorial";
 	string6[9]='\0';
 	sortedArr[5].name=string6;
 	sortedArr[5].frequency=26;
+	sortedArr[5].left=NULL;
+	sortedArr[5].right=NULL;
 
 	/*char string7[6]="bimbo";
 	string7[5]='\0';
@@ -95,6 +107,8 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 	printf("index: %d, numToks:%d \n", index, numToks);
 	while(index<=(numToks-1) || LLptr->next!=NULL){
 		printf("\n********************index: %d*************************\n", index);
+		printf("TREE:\n");
+		printTree(LLptr->Tree);
 		struct HeapNode* newfirst=NULL;
 		struct HeapNode* newsecond=NULL;
 		struct HeapNode* heapHead=NULL;
@@ -150,8 +164,8 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 					printf("name, frequency in first pos: %d, %s\n",(sortedArr[index].frequency), (sortedArr[index].name) );
 					printf("name, frequency in second pos: %d, %s\n",( LLptr->Tree->frequency), (LLptr->Tree->name) );
 					newfirst=makeHeapNode(newfirst, sortedArr[index].frequency,  sortedArr[index].name);
-					newsecond=makeHeapNode(newsecond, LLptr->Tree->frequency, LLptr->Tree->name);
-					heapHead=makeTree(heapHead, newfirst, newsecond);
+					//newsecond=makeTree(newsecond, LLptr->Tree->left, LLptr->Tree->right);//wronk
+					heapHead=makeTree(heapHead, newfirst, LLptr->Tree);
 					insert(&LLptr, &heapHead, heapHead->frequency);
 					printf("Before deletion:\n");
 					printLL(LLptr);
@@ -180,9 +194,10 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 					printf("Next LL is smaller\n");
 					printf("name, frequency in first pos: %d, %s\n",(LLptr->Tree->frequency), LLptr->Tree->name );
 					printf("name, frequency in second pos: %d, %s\n",(LLptr->next->Tree->frequency), LLptr->next->Tree->name  );
-					newfirst=makeHeapNode(newfirst, LLptr->Tree->frequency, LLptr->Tree->name);
-					newsecond=makeHeapNode(newsecond,LLptr->next->Tree->frequency,LLptr->next->Tree->name);
-					heapHead=makeTree(heapHead, newfirst, newsecond);
+					
+					//newfirst=makeTree(newfirst, LLptr->Tree->left, LLptr->Tree->right);//newfirst, LLptr->Tree->frequency, LLptr->Tree->name);
+					//newsecond=makeHeapNode(newsecond, LLptr->next->Tree->left, LLptr->next->Tree->right);//newsecond,LLptr->next->Tree->frequency,LLptr->next->Tree->name);
+					heapHead=makeTree(heapHead, LLptr->Tree, LLptr->next->Tree);
 					insert(&LLptr, &heapHead, heapHead->frequency);
 					printf("\nBefore deletions:\n");
 					printLL(LLptr);
@@ -196,9 +211,9 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 				printf("Arr is smaller\n");
 				printf("name, frequency in first pos: %d, %s\n",(LLptr->Tree->frequency), LLptr->Tree->name );
 				printf("name, frequency in second pos: %d, %s\n",(sortedArr[index].frequency), (sortedArr[index].name) );
-				newfirst=makeHeapNode(newfirst, LLptr->Tree->frequency, LLptr->Tree->name);
+				//newfirst=makeHeapNode(newsecond, LLptr->Tree->left, LLptr->Tree->right);//newfirst, LLptr->Tree->frequency, LLptr->Tree->name);
 				newsecond=makeHeapNode(newsecond, sortedArr[index].frequency, sortedArr[index].name);
-				heapHead=makeTree(heapHead, newfirst, newsecond);
+				heapHead=makeTree(heapHead, LLptr->Tree, newsecond);
 				insert(&LLptr, &heapHead, heapHead->frequency);
 				index++;
 				printf("\nBefore deletion:\n");
@@ -269,9 +284,9 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 			}*/
 		
 		
-	
 		printf("\nDONE\n");
 	}
+	printTree(LLptr->Tree);
 	return LLptr->Tree;
 	
 	/*while we arent at the end of sortedArr, or there is more than one node in the LL (i.e. head->next!=null)
@@ -300,6 +315,21 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 		make new head node, no name, just frequency, frequency=frequency1+frequency2
 		append to end of LL (or use insertion sort if absolutely necessary)*/
 }
+
+void printTree(struct HeapNode* node){
+	 if (node == NULL) 
+          return; 
+   /* then print the data of node */
+     printf("print: _%s_  _%d_ \n", node->name, node->frequency);   
+     /* first recur on left child */
+     printTree(node->left); 
+ 
+  
+     /* now recur on right child */
+     printTree(node->right); 
+}
+
+
 struct HeapNode* makeTree(struct HeapNode* head, struct HeapNode* smaller, struct HeapNode* larger){
 		printf("IN MAKETREE\n\n");
 		head=(struct HeapNode*)malloc(1*sizeof(struct HeapNode));
@@ -313,7 +343,17 @@ struct HeapNode* makeTree(struct HeapNode* head, struct HeapNode* smaller, struc
 		printf("HELLO\n\n");
 		head->name=headName;
 		head->left=smaller;
+		printf("INSERTING SMALLER\n");
+		printTree(smaller);
 		head->right=larger;
+		if(larger->height>smaller->height){
+			head->height=(larger->height)++;
+		}
+		else{
+			head->height=(smaller->height)++;
+		}
+		printf("INSERTING LARGER\n");
+		printTree(larger);
 		return head;
 		}
 
@@ -321,6 +361,7 @@ struct LLNode* makeNode(struct LLNode* newNode, struct HeapNode* tree){
 	newNode=(struct LLNode*)malloc(1*sizeof(struct LLNode));
 	newNode->Tree=tree;
 	newNode->next=NULL;
+	newNode->height=1;
 	return newNode;
 	}
 

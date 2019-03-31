@@ -552,6 +552,6 @@ struct HeapNode* makeHeapNode(struct HeapNode* node, int freq, char* token){
 	node->frequency=freq;
 	node->left=NULL;
 	node->right=NULL;
-	newNode->height=1;
+	node->height=1;
 	return node;
 }

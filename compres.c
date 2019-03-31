@@ -100,7 +100,10 @@ int compress(char* tocompress, char* codebook){
    // printf("\n\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     if (isFile(tocompress) == 1){
          int fd= open(tocompress, O_RDONLY);
-     
+     	if(fd == -1){
+     	printf("Error: Could not open file to compress.\n");
+     	return 0;
+     	}
         //create the output file
         int clen = strlen(tocompress)+ strlen(".hcz");
         char* filename = (char*) malloc(clen*sizeof(char));
@@ -110,12 +113,16 @@ int compress(char* tocompress, char* codebook){
         int le = strlen(tocompress);
        // int comp = strlen(tocompress);
        // comp = comp - 4;
-        //strncpy(filename, tocompress, comp);
+        strcpy(filename, tocompress);
         //strcat(filename, "1.txt");
         strcat(filename, ".hcz");
         int towrite = open(filename, O_CREAT | O_RDWR | O_APPEND);
         int size=lseek(fd, 0, SEEK_END);//find the size of the string
         int l= lseek(fd, 0, SEEK_SET);
+        char* buffer = (char*) malloc(size);
+    read(fd, buffer,size); 
+    printf("C BUFFER:[%s]((((((())))))))))))) \n", buffer);
+    int t= lseek(fd, 0, SEEK_SET);
         int totaltokcounter=0;
         int tokenlength=0;
         //char* token;
@@ -232,16 +239,21 @@ printf("111\n\n\n");
 
 char* retcode(char* tofind, char* codebook){
 
-if (isFile(codebook) == 1){
+//if (isFile(codebook) == 1){
     int cb = open(codebook, O_RDONLY);
     int size=lseek(cb, 0, SEEK_END);//find the size of the file
-    int l= lseek(cb, 0, SEEK_SET); 
+    int l= lseek(cb, 0, SEEK_SET);
+    char* buffer = (char*) malloc(size);
+    read(cb, buffer,size);
+     printf("RC BUFFER:[%s]############################### \n", buffer); 
+    int t= lseek(cb, 0, SEEK_SET);
     char* code;  // holds huffman code
     char* token; //holds word
     int codelength=0;
     int tokenlength=0;
     int codebookread=0;
     int tofindlen = strlen(tofind); //length of the word looking for
+    
 
     // error check to make sure the target's delimiters are removed
     //token is a delimiter len ==1 --> no letters. null [len]/[1] & cntrlcode [len-1] /[0]
@@ -252,6 +264,18 @@ if (isFile(codebook) == 1){
     if( (iscntrl(tofind[tofindlen-1]) > 0 || tofind[tofindlen] == ' ') && tofind[tofindlen-1]!= '\0' && tofindlen>1){
         tofind[tofindlen-1] = '\0';
     }
+}
+char* key = (char*) malloc(3*sizeof(char));
+if(key == NULL){
+printf("could not malloc space for escape sequence key\n");
+return "3";
+}
+key = getNextToken(codebook, size - codebookread , codebookread);
+codebookread = codebookread + (strlen(key));
+printf("Key: %s CodebookR: %d \n", key, codebookread);
+int cntrl=0;
+if(iscntrl(tofind[0]) >0 || tofind[0] == ' '){
+	cntrl = 1;
 }
     //size is the bytes in the codebook
      while(codebookread < size){
@@ -271,17 +295,27 @@ if (isFile(codebook) == 1){
         token = getNextToken( codebook,  size - codebookread, codebookread);    
         tokenlength = strlen(token);
         codebookread = codebookread+tokenlength;
-         if(token[0] == ' ' || iscntrl(token[0])>0){
-            char* discard = getNextToken(codebook, size -codebookread, codebookread);
-            tokenlength = strlen(discard);
-            codebookread = codebookread+tokenlength;
-            printf("for token:[%s]\n", token );
-
-        }
-        if(strcmp(token, "3")==0){
+         if(strcmp(token, "3")==0){
             printf("Error: Could not retrieve token in HuffmanCodebook at offset:%d \n", codebookread);
             return "5";
         }
+         if(cntrl==1){
+            if (token[0] == '^' && token[1]=='%'){
+            	//char ctok = token[2];
+            	char itf = tofind[0];
+            	int ctf = itf;
+            	
+            	//int itok = ctok;
+            	printf("CONTROL: %c %d \n",  itf, ctf);
+            	if((ctf== 32 && token[2] == 'w')||(ctf== 9 && token[2] == 't')||(ctf== 10 && token[2] == 'n')||(ctf== 0 && token[2] == '0')||(ctf== 11 && token[2] == 'v') ||(ctf== 12 && token[2] == 'f')||ctf== 13 && token[2] == 'r'||ctf== 7 && token[2] == 'a'||ctf== 8 && token[2] == 'b'||ctf== 27 && token[2] == 'e'){
+            		return code;
+            	}
+            		
+            	}
+            }
+
+        
+       
 
         // tokens and code exist. code and token are guaranteed to have one delimiter at end, [len-1]
 
@@ -316,10 +350,10 @@ if (isFile(codebook) == 1){
         }
         printf("RC Errors: Code not found\n");
         return "3";
-    }
-else{
-   return "RC Not a file\n";
-   }
+    //}
+//else{
+//   return "RC Not a file\n";
+//   }
 }
 int main (int argc, char**argv){
 

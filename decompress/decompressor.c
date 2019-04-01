@@ -103,10 +103,58 @@ printf("CODEBOOK IN TREEFROMC: %s\n", codebook);
 	//int bufIndex=0;
 	//read(fd, buffer,size);
 	int count=2;//allows you to assign unique names to heads based on the ranking of their insertion
-	int longestpath=0;
+	int longestpath=0;//for testing purposes only, get rid of me
 	int bytesRead=0;
+	int codelength=0; 
+	int tokenlength = 0;
+	char* token;
+	char*code;
+	char* key = (char*) malloc(3*sizeof(char));
+	if(key == NULL){
+	printf("could not malloc space for escape sequence key\n");
+	return ;
+	}
+	key = getNextToken(codebook, size - bytesRead , bytesRead);
+	bytesRead = bytesRead + (strlen(key));
 
+     while(bytesRead < size){
+        code = getNextToken(codebook, size - bytesRead , bytesRead);
+        codelength = strlen(code);
+        bytesRead = bytesRead + codelength;
+        //printf("RC code:[%s]\n",code);
+	if(codelength > longestpath){
+	longestpath = codelength;
+	}
+        if(strcmp(code, "3")==0){
+            printf("Error: Could not retrieve code in HuffmanCodebook at offset:%d \n", bytesRead);
+            
+            return 0;
+        }
+       
+        token = getNextToken( codebook,  size - bytesRead, bytesRead);    
+        tokenlength = strlen(token);
+        bytesRead = bytesRead+tokenlength;
+         if(strcmp(token, "3")==0){
+            printf("Error: Could not retrieve token in HuffmanCodebook at offset:%d \n", bytesRead);
+            return 0;
+        }
+       
+        // tokens and code exist. code and token are guaranteed to have one delimiter at end, [len-1]
 
+        if(tokenlength > 1){
+            token[tokenlength-1] = '\0' ; // delete delimiter
+        }
+        else if (tokenlength == 1){
+            token[1] = '\0';
+        }
+        if(codelength > 1){
+            code[codelength-1] = '\0' ;
+        }
+        else if(codelength == 1){
+            code[1] = '\0';
+        }
+
+/*
 	while(bytesRead<size){
 		buffer=getNextToken(codebook, size-bytesRead, bytesRead);
 
@@ -129,7 +177,7 @@ printf("CODEBOOK IN TREEFROMC: %s\n", codebook);
                 delim[0] = buffer[0];
 		// if is char or if is cntrl token[0]
                 if(iscntrl(buffer[buffLen-1]) > 0 || buffer[buffLen-1] == ' '){
-                	buffer[buffLen] = '\0';
+                	buffer[buffLen-1] = '\0';
                 //printf("COMPRESS TOKEN:[%s]\n", token);
                 }
                 //token[tokenlength-1] = '\0';
@@ -155,8 +203,12 @@ printf("CODEBOOK IN TREEFROMC: %s\n", codebook);
 			else if(delim[0]=='\n' && buffLen!=1){
 				//printf("EXCUSE ME\n");
 				dictEntry[1]=buffer;
+		*/		
+				dictEntry[0] = code;
+				dictEntry[1] = token;
 				int length=strlen(dictEntry[0]);
 				//**********************************
+			
 				if(longestpath<length){
 				longestpath=length;
 				}
@@ -168,8 +220,8 @@ printf("CODEBOOK IN TREEFROMC: %s\n", codebook);
 				printf("count : %d\n\n", count);
 				free(dictEntry[0]);
 				free(dictEntry[1]);
-				}
-		}
+				
+		//}
 		printf("\nBYTES READ: %d, SIZE: %d\n", bytesRead, size);
 	}
 
@@ -392,17 +444,17 @@ printf("strlen(token): %d", size);
 	}
 	if(directions[index]=='1'){//if(directions[0]='1')
 	printf("going right\n");
-	count++;
+	//count++;
 	index++;
 	printf("count in right %d\n", count);
-	head->right=insertEntry(head->right,directions, token, index, count);//syntax
+	head->right=insertEntry(head->right,directions, token, index, count+1);//syntax
 	}
 	if(directions[index]=='0'){//if(directions[0]='1')
 	printf("going left\n");
-	count++;
+	//count++;
 	printf("count in left %d\n", count);
 	index++;
-	head->left=insertEntry(head->left,directions, token, index, count);
+	head->left=insertEntry(head->left,directions, token, index, count+1);
 	printf("returned\n");
 	}
 	printf("index: %d, returning\n", index);
@@ -453,11 +505,11 @@ void decompress(const char* compressed,char* codebook){
 	if(td == -1){
 	printf("Error: Cannot open Compressed file\n");
 	}
-int sc = lseek(td, 0 , SEEK_END);//DELETE ME
+int sc = lseek(td, 0 , SEEK_END);
 int r = lseek(td, 0, SEEK_SET);
 char* cbuf[sc];
 read(td, cbuf, sc);
-printf("cbuf:%s\n", cbuf);
+printf("cbuf:[%s] \n", cbuf);
 int q = lseek(td, 0, SEEK_SET);
 	
 	clen = clen - 4; // subtract ".hcz" HAVE TO CHECK IF .HCZ
@@ -489,15 +541,17 @@ printf("hello\n");
 
 
 
-
+int bytesread=0;
 	while(read(td, buffer,1)){
+	bytesread= bytesread+1;
 		if(ptr==NULL){
 			printf("invalid data in compressed file\n");
 			ptr=head;//reset
 			//return; // ??????
 		}
 		if(ptr->left!=NULL || ptr->right!=NULL){
-printf("ptrname:[%s]  buffer[0]:[%c]\n", ptr->name, buffer[0]);
+		int val = atoi(ptr->name);
+printf("vla:%d ptrname:[%d]  buffer[0]:[%c]\n", val, ptr->name[0], buffer[0]);
 			if(buffer[0]=='0' ){
 				printf("left\n");
 				ptr=ptr->left;
@@ -509,7 +563,11 @@ printf("ptrname:[%s]  buffer[0]:[%c]\n", ptr->name, buffer[0]);
 				ptr=ptr->right;
 				
 			}
-			else if(buffer[0]!='1' && buffer[0]!='0'){
+			if(buffer[0]!='1' && buffer[0]!='0' && bytesread == sc-1){
+			break;
+			}
+			else if (buffer[0]!='1' && buffer[0]!='0' && bytesread<sc){
+				printf("BUFFER: %c\n", buffer[0]);
 				printf("Error in Decompress:Compressed file contained a non 1 or 0 number \n");
 			return;
 			}

@@ -65,7 +65,7 @@ int main(int argc, char** argv){
 	return 0;
 
 }
-void builde(char* filename){ //FOR TESTING PURPOSES ONLY
+void build(int flag, char* filename){ //FOR TESTING PURPOSES ONLY
 	// get size of file, getnexttoken, send into hashmap 
 	if(isFile(filename) == 1){
 		int fd = open(filename, O_RDONLY);
@@ -104,16 +104,12 @@ void builde(char* filename){ //FOR TESTING PURPOSES ONLY
                     delim[0] = token[tokenlength-1];
                     delim[1] = '\0';
                     token[tokenlength-1] = '\0';
-                    //printf("C Token:[%s] \n", token);
                 }
             }
-        printf("here tt%d\n", numToks);
-printf("token:[%s] delim:[%s]",token, delim);
             absent =seek(token);
             if(absent == 1){
             	addNode(&token);
             	numToks = numToks+1; //increments by size of pointer 
-            	printf("tt: %d  ", numToks);
             }
             
 
@@ -121,36 +117,19 @@ printf("token:[%s] delim:[%s]",token, delim);
             if(absent == 1){
             	addNode(&delim);
             	numToks = numToks+1;
-            	printf("tt delim: %d\n", numToks);
             	
             }
-         printf("readbytes: %d size:%d \n", readbytes,size);  
          if(readbytes == size){
-         printf("entered \n");
          break;
          } 
         } 
-        printf("left \n");
         // finished reading the file and creating the hash table. Create heap
-        struct HeapNode* sortedHeapHead=NULL;
-         printf("left2 \n");
-         printf("numToks %d\n", numToks);
+       if(flag ==0 ){
+		struct HeapNode* sortedHeapHead=NULL;
 		sortedHeapHead= hashToArr();
-		 printf("left 3\n");
-		//heap done. create tree
-		
-		printf("************************************************\n\n");
-		printTree(sortedHeapHead);
-		printf("************************************************\n");printf("************************************************\n\n");printf("************************************************\n\n");printf("************************************************\n\n");
 		struct HeapNode *treehead = buildhTree(sortedHeapHead, treehead);
-		printf("hello heap\n");
-		
-		printTree(treehead);
-		printf("now lets wait a sec\n");
 		buildCBook(treehead);
-		printf("hello book\n");
-		//deallocate(sortedHeapHead); 
-		
+       	}
 	}	
 	else{
 		printf("error not a file \n");
@@ -159,45 +138,6 @@ printf("token:[%s] delim:[%s]",token, delim);
 
 
 }
-
-	/*FILE *ip;
-	int i=0;
-	char* val[11];
-	for(i=0; i<10;i++){
-	val[i]=(char*)malloc(15);
-	}
-	struct HashNode* HashTable[10000];
-		for(i=0; i<10000; i++){
-			HashTable[i]=NULL;
-		}
-	if(argc<2){
-	printf("error");
-	return 0;
-	}
-	ip=fopen(argv[1], "r");
-		if(ip==NULL){
-		printf("error");
-		fclose(ip);
-		return 0;
-		}
-		i=0;
-		int z;
-		for(z=0; z<11; z++){
-			fscanf(ip, "%s", val[i]);
-				printf("Hashing %s\n", val[i]);
-				addNode(HashTable, &val[i]);
-				printf("henlo?\n");
-		i++;
-		}
-	printf("done\n");
-	fclose(ip);
-	//deallocate hashtable
-	for(i=0; i<10000; i++){
-		struct HashNode* temp=HashTable[i];
-		deallocate(temp);
-	}
-	return 0;*/
-
 int isFile(char *to_read) {
 
   struct stat s;
@@ -244,7 +184,6 @@ char* getNextToken(char* filename, int size, int offset){
        }
        else{
        	tokensize = sizeof(token);
-        printf("size of token:%d\n", tokensize);
         char* temp = (char*) realloc(token , (tokensize+10) * sizeof(char) );
         if(temp ==NULL){
             printf("Error: Cannot malloc space for token\n");
@@ -301,7 +240,6 @@ void addNode(char** string){
 	}
 	else {		
 			struct HashNode* HNode=makeHashNode(*string);
-			printf("HNode->key: %d\n", HNode->key);
 			if(HashTable[HNode->key]==NULL){
 				HashTable[HNode->key]=HNode;
 			}
@@ -351,7 +289,6 @@ void deallocate(struct HashNode* head){
 	return;
 }
 struct HeapNode* hashToArr(){
-printf("numtoks: %d", numToks);
 	struct HeapNode* heapArr=(struct HeapNode*)malloc(numToks*sizeof(struct HeapNode));
 	int i=0;//keeps track of hashtable index
 	int j=0;//keeps track of array index
@@ -360,9 +297,7 @@ printf("numtoks: %d", numToks);
 			struct HashNode* ptr=HashTable[i];
 			while(ptr!=NULL){//fill in array values
 				heapArr[j].name=(ptr)->token;
-				printf("adding %s to heapArr at index %d\n", heapArr[j].name, j);
 				heapArr[j].frequency=ptr->frequency;
-				printf("frequency at %d: %d\n", j, heapArr[j].frequency);
 				heapArr[j].left=NULL;
 				heapArr[j].right=NULL;
 				j++;
@@ -370,41 +305,20 @@ printf("numtoks: %d", numToks);
 			}
 		}
 	}
-	printf("******************************************************\nBefore First Heapify:\n");
-	for(i=0; i<numToks;i++){
-		printf("%s at index %d\n", heapArr[i].name, i);
-	}
+	
 	for (i = (numToks / 2) - 1; i >= 0; i--){ 
         	heapify(&heapArr, numToks, i); 
 		}
-	printf("******************************************************\nAfter First Heapify:\n");
-	for(i=0; i<numToks;i++){
-		printf("%s at index %d\n", heapArr[i].name, i);
-	}
   
     // One by one extract an element from heap 
     for (i=numToks-1; i>=0; i--) 
-    { 
-	printf("*********************************************\nBefore Swap:\n");
-	int z=0;
-	for(z=0; z<numToks;z++){
-		printf("%s at index %d\n", heapArr[z].name, z);
-	}
+    {
         // Move current root to end 
         swap(&heapArr, numToks, i); //(struct HeapNode* arr, int largest)
-  	printf("************************************************\nAfter Swap:\n");
-	for(z=0; z<numToks;z++){
-		printf("%s at index %d\n", heapArr[z].name, z);
-	}
         // call max heapify on the reduced heap 
         heapify(&heapArr, i, 0); 
 	//***************************************************************************************************
     } 
-    int b=0;
-    for(b =0; b<numToks; b++){
-    	printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2 \n heap[%d].name = [%s] .frequency = [%d]\n @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n", b, heapArr[b].name, heapArr[b].frequency);
-    }
-    
 	return heapArr;
 }
 

@@ -39,14 +39,14 @@ void listdir(const char* dirname, const char* codebook){
             //is file
             else if(dir_info->d_type == DT_REG){
                 if(flag ==1){
-                	//code this
+                	build(1, path);
                 }
-                if(flag == 2){
-				compress(path, codebook);
-				}
-				if(flag == 3){
-				decompress(path, codebook);
-				}
+                else if(flag == 2){
+			compress(path, codebook);
+		}
+		else if(flag == 3){
+			decompress(path, codebook);
+		}
             }
             //error check
             else if(dir_info->d_type == DT_UNKNOWN){
@@ -55,6 +55,12 @@ void listdir(const char* dirname, const char* codebook){
             }
 
         }
+	if (flag == 1){
+		struct HeapNode* sortedHeapHead=NULL;
+		sortedHeapHead= hashToArr();
+		struct HeapNode *treehead = buildhTree(sortedHeapHead, treehead);
+		buildCBook(treehead);  
+	}
     closedir(currdir);
     }
 

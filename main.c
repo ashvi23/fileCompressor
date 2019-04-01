@@ -20,7 +20,12 @@ int main(int argc, char** argv){
 	if(argc == 3){
 		if(strcmp(argv[1], "-b")==0 && isFile(argv[2]) ==1){
 			//call build codebook
-			build(argv[2]);
+		int i=0;
+		for(i=0; i<10000; i++){
+			HashTable[i]=NULL;
+		}
+		int* numToks =0;
+			build(0, argv[2]);
 
 		}
 		else {

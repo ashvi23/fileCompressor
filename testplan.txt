@@ -1,0 +1,25 @@
+Testplan:
+
+Part I: Valid Cases
+1. All control characters.
+2. One word files with no delimeter
+3. control codes are written '\' 'n'
+4. A small paragraph from a book
+5. Non .txt files
+
+
+Part II: Invalid Cases
+1. When compressing/decompressing - a word/code does not exist in the codebook
+2. 
+
+Part III: Time Complexity
+1. Recursion on a lot of directories and files but each of them only has a few token per file
+2. Same as above but this time one of the files returns an error while:
+    A. Recursing -Empty file, directory with no open permission, dead end folder recursions
+    B. Buildcodebook - Doesn't have permission to open a file, ran out of space
+    C. Compress - One of the tokens is not in the codebook.
+    D. Decompress - 
+
+Part IV: Time and Space Complexity
+1. 50,000 word file
+2. Mixture of small and big files (1k - 40k)

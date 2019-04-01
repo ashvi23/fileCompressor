@@ -9,7 +9,7 @@
 //CHECK IF FILE CONTAINS HCZ (return if it doesn't)
 struct HeapNode* makeHeapNode(struct HeapNode* node, int freq, char* token);
 void reverse(char*, int length) ;
-char* itoa(int num, char* str) ;
+char* itoa(int num, char* str, int base) ;
 //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& 
 void traverseTree(struct HeapNode* root,char path[], int index, int dir);
 char* getNextToken(char* filename, int size, int offset);
@@ -19,23 +19,32 @@ void printTree(struct HeapNode* head);
 struct HeapNode* makeHeapNode(struct HeapNode* node, int freq, char* token);
 void decompress( char* compressed, char* codebook);
 //remember to free everything everwhere
-char* itoa(int num, char* str) 
+char* itoa(int num, char* str, int base) 
 { 
     int i = 0; 
-    int isNeg = 0; 
+    int isNegative = 0; 
+  
+    /* Handle 0 explicitely, otherwise empty string is printed for 0 */
     if (num == 0) 
     { 
         str[i++] = '0'; 
         str[i] = '\0'; 
         return str; 
     } 
+ 
+    // Process individual digits 
     while (num != 0) 
     { 
-        int rem = num % 10; 
+        int rem = num % base; 
         str[i++] = (rem > 9)? (rem-10) + 'a' : rem + '0'; 
-        num = num/10; 
+        num = num/base; 
     } 
-    str[i] = '\0'; 
+  
+    str[i] = '\0'; // Append string terminator 
+  
+    // Reverse the string 
+    //reverse(str, i); 
+  printf("STR :%s ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n", str);
     return str; 
 } 
 /*void reverse(char* str, int length) 
@@ -438,7 +447,7 @@ struct HeapNode* makeHeapNode(struct HeapNode* node, int freq, char* token){
 	return node;
 }
 //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-void decompress( char* compressed, char* codebook){
+void decompress(const char* compressed,const char* codebook){
   if (isFile(compressed) == 1){
   printf("Compressed: %s\n",compressed);
   printf("Codebook: %s\n",codebook);
@@ -448,18 +457,22 @@ void decompress( char* compressed, char* codebook){
 	head=treeFromCBook( head, codebook); // ????needs head
 	struct HeapNode* ptr=NULL;
 	ptr=head;
-	int td=open(compressed, O_RDWR);
+	int td=open(compressed, O_RDWR);//opening compressed file (binary, .hcz)
+	int clen = strlen(compressed);
+	const char *last_four = &compressed[clen-4];//setting a pointer to the last four letters of the pathname
+	if(strcmp(last_four, ".hcz")!=0 || clen<=4){
+		printf("Error: Wrong Filetype for Compression\n");
+		}
 	if(td == -1){
 	printf("Error: Cannot open Compressed file\n");
 	}
-int sc = lseek(td, 0 , SEEK_END);
+int sc = lseek(td, 0 , SEEK_END);//DELETE ME
 int r = lseek(td, 0, SEEK_SET);
 char* cbuf[sc];
 read(td, cbuf, sc);
 printf("cbuf:%s\n", cbuf);
 int q = lseek(td, 0, SEEK_SET);
 	
-	int clen = strlen(compressed);
 	clen = clen - 4; // subtract ".hcz" HAVE TO CHECK IF .HCZ
 	char* decompressed = (char*) malloc(clen*sizeof(char));
 	if(decompressed == NULL){
@@ -516,19 +529,21 @@ printf("ptrname:[%s]  buffer[0]:[%c]\n", ptr->name, buffer[0]);
 		}
 		if(ptr->left==NULL && ptr->right==NULL){
 			
-			printf("ptr->name: %s\n", ptr->name);
+			//printf("ptr->name: %s\n", ptr->name);
+			//printf("(*ptr).name: %s\n", (*ptr).name);
 			int currSize=ptr->frequency;
 			char* currToken= NULL;
-			currToken=(char*)malloc(currSize*sizeof(char));
+			currToken= (char*)malloc(currSize*sizeof(char));
 			if(currToken == NULL){
 				printf("Malloc failed in decompress\n");
 				return;
 			}
-			currToken=ptr->name;
-			printf("ptr:[%s] currsize:%d\n",ptr->name, currSize );
+			memcpy(currToken,(*ptr).name, currSize);//
+			currToken=memcpy(currToken, (*ptr).name, currSize);
 			printf("currToken: %s\n", currToken);
+
 			int written = write(id, currToken, currSize);
-printf("written: %d", written);
+//printf("written: %d", written);
 			if(written <1){
 				printf("Error Write to file failed in Decompress\n");
 				return;

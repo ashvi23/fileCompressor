@@ -1,4 +1,4 @@
-har* getNextToken(char* filename, int size, int offset){
+char* getNextToken(char* filename, int size, int offset){
     if(size ==0){
         return "3";
     }

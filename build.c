@@ -8,6 +8,8 @@
 #include <sys/stat.h>
 #include <ctype.h>
 //keep track of the number of words added to hahstable accross all files
+int numToks;
+struct HashNode* HashTable[10000];
 struct HashNode{
 	char* token;
 	int key;
@@ -31,16 +33,16 @@ char* getNextToken(char* filename, int size, int offset);
 
 struct HashNode* makeHashNode(char* string);
 int getKey(char* string);
-void addNode(struct HashNode** HashTable,char** string);//*
-int seek(struct HashNode** HashTable,char* string);
+void addNode(char** string);//*
+int seek(char* string);
 void deallocate(struct HashNode* head);
 void swap(struct HeapNode** arr, int size, int largest);
 struct HeapNode* makeHeapNode(struct HeapNode* node, int freq, char* token);
 
 void heapify(struct HeapNode** arr, int size, int i);
-struct HeapNode* hashToArr(struct HashNode** HashTable, int numToks);
+struct HeapNode* hashToArr();
 struct HeapNode* makeTree(struct HeapNode* head, struct HeapNode* smaller, struct HeapNode* larger);
-struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHead, int numToks);
+struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHead);
 struct LLNode* makeNode(struct LLNode* newNode, struct HeapNode* tree);
 
 void delete(struct LLNode **head, char* Name);
@@ -50,20 +52,20 @@ void printLL(struct LLNode *head);
 void buildCBook(struct HeapNode* hufftree);//ADD: const char* pathname
 void traverseTree(struct HeapNode* root,char path[], int index, int filedesc,  int dir);//dir is direction
 void printTree(struct HeapNode* node);
-void builde(char* filename, struct HashNode** HashTable, int *tokentally);
+void builde(char* filename);
 
 int main(int argc, char** argv){
-	struct HashNode** HashTable[10000];
+	//struct HashNode* HashTable[10000];
 	int i=0;
 	for(i=0; i<10000; i++){
 			HashTable[i]=NULL;
-		}
-	int* tokentally =0;
-	builde(argv[1], *HashTable, tokentally);
+	}
+	int* numToks =0;
+	builde(argv[1]);
 	return 0;
 
 }
-void builde(char* filename, struct HashNode** HashTable, int *tokentally){ //FOR TESTING PURPOSES ONLY
+void builde(char* filename){ //FOR TESTING PURPOSES ONLY
 	// get size of file, getnexttoken, send into hashmap 
 	if(isFile(filename) == 1){
 		int fd = open(filename, O_RDONLY);
@@ -77,7 +79,7 @@ void builde(char* filename, struct HashNode** HashTable, int *tokentally){ //FOR
 		int tokenlength =0;
 		int absent = 0;
 		char* delim;
-		
+		numToks =0;
 		while(readbytes<size){
 		char* token = getNextToken(filename, size - readbytes, readbytes);
 		if(strcmp(token, "3")==0){
@@ -86,6 +88,7 @@ void builde(char* filename, struct HashNode** HashTable, int *tokentally){ //FOR
 		}
 		tokenlength = strlen(token);
 		readbytes = readbytes + tokenlength;
+		
 
 		delim = (char*) malloc(2 * sizeof(char));
 		 if(tokenlength == 1){
@@ -104,26 +107,46 @@ void builde(char* filename, struct HashNode** HashTable, int *tokentally){ //FOR
                     //printf("C Token:[%s] \n", token);
                 }
             }
-
-            absent =seek(HashTable,token);
+        printf("here tt%d\n", numToks);
+printf("token:[%s] delim:[%s]",token, delim);
+            absent =seek(token);
             if(absent == 1){
-            	addNode(HashTable,&token);
-            	tokentally = tokentally+1;
+            	addNode(&token);
+            	numToks = numToks+1; //increments by size of pointer 
+            	printf("tt: %d  ", numToks);
             }
+            
 
-            absent =seek(HashTable,delim);
+            absent =seek(delim);
             if(absent == 1){
-            	addNode(HashTable,&delim);
-            	tokentally = tokentally+1;
+            	addNode(&delim);
+            	numToks = numToks+1;
+            	printf("tt delim: %d\n", numToks);
+            	
             }
+         printf("readbytes: %d size:%d \n", readbytes,size);  
+         if(readbytes == size){
+         printf("entered \n");
+         break;
+         } 
         } 
+        printf("left \n");
         // finished reading the file and creating the hash table. Create heap
         struct HeapNode* sortedHeapHead=NULL;
-		sortedHeapHead=hashToArr(HashTable, *tokentally);
+         printf("left2 \n");
+         printf("numToks %d\n", numToks);
+		sortedHeapHead= hashToArr(HashTable);
+		 printf("left 3\n");
 		//heap done. create tree
-		struct HeapNode *treehead = buildhTree(sortedHeapHead, treehead, *tokentally);
+		struct HeapNode *treehead = buildhTree(sortedHeapHead, treehead);
+		printf("hello heap\n");
+		
+		printTree(treehead);
+		pritnf("now lets wait a sec\n");
 		buildCBook(treehead);
+		printf("hello book\n");
 		//deallocate(sortedHeapHead); 
+		
 	}	
 	else{
 		printf("error not a file \n");
@@ -259,8 +282,8 @@ struct HashNode* makeHashNode(char* string){
 	return newNode;
 }
 
-void addNode(struct HashNode** HashTable,char** string){
-	int isDup = seek(HashTable, *string);//syntax??
+void addNode(char** string){
+	int isDup = seek( *string);//syntax??
 	if(isDup==0){
 		return;	
 	}
@@ -284,12 +307,13 @@ void addNode(struct HashNode** HashTable,char** string){
 
 }
 
-int seek(struct HashNode** HashTable,char* string){
+int seek(char* string){
 	
 	int absent=1;
 	int key=getKey(string);	
-	printf("key: %d\n", key);
-	struct HashNode *temp=HashTable[key];
+	//printf("seek: key: %d, string:[%s]\n", key,string);
+	
+	struct HashNode *temp= HashTable[key];
 		while(temp!=NULL){
 			//printf("temp->token: %s\n", temp->token);
 			if(strncmp(temp->token, string, strlen(string+1))==0){
@@ -299,7 +323,8 @@ int seek(struct HashNode** HashTable,char* string){
 			}
 		temp=temp->next;
 		}
-	free(temp);
+		
+	//free(temp);
 	return absent;
 }
 
@@ -313,11 +338,12 @@ void deallocate(struct HashNode* head){
 	free(head);
 	return;
 }
-struct HeapNode* hashToArr(struct HashNode** HashTable, int numToks){
+struct HeapNode* hashToArr(){
+printf("numtoks: %d", numToks);
 	struct HeapNode* heapArr=(struct HeapNode*)malloc(numToks*sizeof(struct HeapNode));
 	int i=0;//keeps track of hashtable index
 	int j=0;//keeps track of array index
-	for(i=0; i<10; i++){//visit each index of the Hashtable
+	for(i=0; i<10000; i++){//visit each index of the Hashtable
 		if(HashTable[i]!=NULL){
 			struct HashNode* ptr=HashTable[i];
 			while(ptr!=NULL){//fill in array values
@@ -406,7 +432,7 @@ void swap(struct HeapNode** arr, int size, int largest){
 	}
 	return;
 	}
-	struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHead, int numToks){
+	struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHead){
 	int size=sizeof(sortedArr);
 	printf("SIZE OF ARR: %d\n", size);
 	struct LLNode* LLptr=NULL;
@@ -854,3 +880,4 @@ void traverseTree(struct HeapNode* root,char path[], int index, int filedesc, in
 		printf("returning\n");}
 		//return;
 	}
+

@@ -20,6 +20,7 @@ int main(int argc, char** argv){
 	if(argc == 3){
 		if(strcmp(argv[1], "-b")==0 && isFile(argv[2]) ==1){
 			//call build codebook
+			build(argv[2]);
 
 		}
 		else {
@@ -94,10 +95,7 @@ void error(int err){
 		printf("Improper input\n" );
 		return;
 	}
-	else if(err ==2){
-		printf("\n" );
-		return;
-	}
+	
 	else if (err ==3)	{
 		printf("Cannot compress file \n" );
 		return;

@@ -61,7 +61,7 @@ struct HeapNode* treeFromCBook(struct HeapNode* head, char* codebook){
 		    currNodeName[toklen] = '\0';
 		    startingindex = bufIndex+1; //move up starting index
 			if(delim[0]!='\n' && toklen!=0){
-				dictEntry[0]=currNodeName;	
+				dictEntry[0]=currNodeName;//set dictEntry[0] to bitstring 	
 			}
 			else if(delim[0]=='\n' && toklen!=0){
 				printf("EXCUSE ME\n");

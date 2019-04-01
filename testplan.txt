@@ -6,6 +6,7 @@ Part I: Valid Cases
 3. control codes are written '\' 'n'
 4. A small paragraph from a book
 5. Non .txt files
+6. repetition
 
 
 Part II: Invalid Cases

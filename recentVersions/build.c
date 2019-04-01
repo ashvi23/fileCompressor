@@ -52,19 +52,8 @@ void printLL(struct LLNode *head);
 void buildCBook(struct HeapNode* hufftree);//ADD: const char* pathname
 void traverseTree(struct HeapNode* root,char path[], int index, int filedesc,  int dir);//dir is direction
 void printTree(struct HeapNode* node);
-void builde(char* filename);
+void build(int flag, char* filename);
 
-int main(int argc, char** argv){
-	//struct HashNode* HashTable[10000];
-	int i=0;
-	for(i=0; i<10000; i++){
-			HashTable[i]=NULL;
-	}
-	int* numToks =0;
-	builde(argv[1]);
-	return 0;
-
-}
 void build(int flag, char* filename){ //FOR TESTING PURPOSES ONLY
 	// get size of file, getnexttoken, send into hashmap 
 	if(isFile(filename) == 1){

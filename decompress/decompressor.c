@@ -474,7 +474,7 @@ int q = lseek(td, 0, SEEK_SET);
 	printf("Error: Cannot open Codebook\n");
 	}
 	printf("decompressed: %s\n", decompressed);
-	int id=open(decompressed, O_CREAT | O_RDWR| O_APPEND);
+	int id=open(decompressed, O_CREAT | O_RDWR| O_APPEND, 0644);
 	if(id == -1){
 	printf("Error: Cannot create decompress\n");
 	}
@@ -519,7 +519,7 @@ printf("ptrname:[%s]  buffer[0]:[%c]\n", ptr->name, buffer[0]);
 			//printf("ptr->name: %s\n", ptr->name);
 			//printf("(*ptr).name: %s\n", (*ptr).name);
 			int currSize=ptr->frequency;
-			char* currToken= NULL;
+			/*char* currToken= NULL;
 			currToken= (char*)malloc(currSize*sizeof(char));
 			if(currToken == NULL){
 				printf("Malloc failed in decompress\n");
@@ -527,9 +527,10 @@ printf("ptrname:[%s]  buffer[0]:[%c]\n", ptr->name, buffer[0]);
 			}
 			memcpy(currToken,(*ptr).name, currSize);//
 			currToken=memcpy(currToken, (*ptr).name, currSize);
-			printf("currToken: %s\n", currToken);
-
-			int written = write(id, currToken, currSize);
+			printf("currToken: %s\n", currToken);*/
+			printf("ptr->name: %s", ptr->name);
+			int written = write(id, ptr->name, currSize);
+			printf("written:%d", written);
 //printf("written: %d", written);
 			if(written <1){
 				printf("Error Write to file failed in Decompress\n");
@@ -635,6 +636,7 @@ int main(int argc, char** argv){
 	decompress(argv[1], argv[2]);
 	return 0;
 }
+
 
 
 

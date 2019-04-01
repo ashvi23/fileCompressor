@@ -9,7 +9,7 @@
 //CHECK IF FILE CONTAINS HCZ (return if it doesn't)
 struct HeapNode* makeHeapNode(struct HeapNode* node, int freq, char* token);
 void reverse(char*, int length) ;
-char* itoa(int num, char* str, int base) ;
+char* itoa(int num, char* str) ;
 //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& 
 void traverseTree(struct HeapNode* root,char path[], int index, int dir);
 char* getNextToken(char* filename, int size, int offset);
@@ -19,32 +19,23 @@ void printTree(struct HeapNode* head);
 struct HeapNode* makeHeapNode(struct HeapNode* node, int freq, char* token);
 void decompress( char* compressed, char* codebook);
 //remember to free everything everwhere
-char* itoa(int num, char* str, int base) 
+char* itoa(int num, char* str) 
 { 
     int i = 0; 
-    int isNegative = 0; 
-  
-    /* Handle 0 explicitely, otherwise empty string is printed for 0 */
+    int isNeg = 0; 
     if (num == 0) 
     { 
         str[i++] = '0'; 
         str[i] = '\0'; 
         return str; 
     } 
- 
-    // Process individual digits 
     while (num != 0) 
     { 
-        int rem = num % base; 
+        int rem = num % 10; 
         str[i++] = (rem > 9)? (rem-10) + 'a' : rem + '0'; 
-        num = num/base; 
+        num = num/10; 
     } 
-  
-    str[i] = '\0'; // Append string terminator 
-  
-    // Reverse the string 
-    //reverse(str, i); 
-  printf("STR :%s ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n", str);
+    str[i] = '\0'; 
     return str; 
 } 
 /*void reverse(char* str, int length) 

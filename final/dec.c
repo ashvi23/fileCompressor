@@ -278,7 +278,7 @@ void decompress( const char* compressed, char* codebook){
 			ptr=head;//reset ptr to top of stack
 		}
 	}
-	freeTree(&ptr);
+	freeTree(ptr);
 	return;
 	close(td);
 	close(fd);
@@ -286,7 +286,7 @@ void decompress( const char* compressed, char* codebook){
 
 }
 
-void freeTree(struct HeapNode** headTree){
+void freeTree(struct HeapNode* headTree){
 	if(head==NULL){
 		return;
 	}

@@ -145,7 +145,7 @@ void build(char* filename){ //FOR TESTING PURPOSES ONLY
 		printf("error not a file \n");
 		return;
 	}
-
+freeTree(treehead);
 
 }
 
@@ -446,10 +446,10 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 					heapHead=makeTree(heapHead, newfirst, LLptr->Tree);
 					insert(&LLptr, &heapHead, heapHead->frequency);
 				
-					printLL(LLptr);
+					//printLL(LLptr);
 					delete(&LLptr, (LLptr->Tree->name));//delete LLNode used
 					
-					printLL(LLptr);
+					//printLL(LLptr);
 					index++;//imcrement through the minHeap
 					break;
 				case 2:
@@ -458,7 +458,7 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 					heapHead=makeTree(heapHead, newfirst, newsecond);
 					insert(&LLptr, &heapHead, heapHead->frequency);	
 				
-					printLL(LLptr);
+					//printLL(LLptr);
 					index=index+2;//increment through the minHeap
 					break;
 				case 3:
@@ -472,11 +472,11 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 					heapHead=makeTree(heapHead, LLptr->Tree, LLptr->next->Tree);
 					insert(&LLptr, &heapHead, heapHead->frequency);
 					
-					printLL(LLptr);
+					//printLL(LLptr);
 					delete(&LLptr->next, (LLptr->next->Tree->name));//delete LLNode used
 					delete(&LLptr, (LLptr->Tree->name));//delete LLNode used
 				
-					printLL(LLptr);
+					//printLL(LLptr);
 					break;
 				case 5:
 				case 6:
@@ -486,10 +486,10 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 				insert(&LLptr, &heapHead, heapHead->frequency);
 				index++;
 
-				printLL(LLptr);
+				//printLL(LLptr);
 				delete(&LLptr, (LLptr->Tree->name));//delete LLNode used
 				
-				printLL(LLptr);	
+				//printLL(LLptr);	
 			
 				break;
 				
@@ -498,9 +498,9 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 }
 				
 	}
-	printTree(LLptr->Tree);
+	//printTree(LLptr->Tree);
 	return LLptr->Tree;
-
+freeLL(LLptr);
 }
 void printTree(struct HeapNode* node){
 	 if (node == NULL) 

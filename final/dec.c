@@ -118,17 +118,17 @@ struct HeapNode* insertEntry(struct HeapNode* head, char* directions, char* toke
 		head=node;
 		if(index==strlen(directions)){
 			node->name=token;
-			printf("name:%s\n", node->name);
+			
 			return node;
 		}
 	//return node;
 	}
 	if(directions[index]=='1'){//if(directions[0]='1')
-	printf("going right\n");
+	
 	head->right=insertEntry(head->right,directions, token, index+1);//syntax
 	}
 	else if(directions[index]=='0'){//if(directions[0]='1')
-	printf("going left\n");
+	
 	head->left=insertEntry(head->left,directions, token, index+1);
 	}
 	
@@ -217,7 +217,7 @@ void decompress( const char* compressed, char* codebook){
 	printf("Error: Cannot open Codebook\n");
 	
 	}
-	printf("decompressed: %s\n", decompressed);
+	//printf("decompressed: %s\n", decompressed);
 	int id=open(decompressed, O_CREAT | O_RDWR| O_APPEND, 0644);
 	if(id == -1){
 	printf("Error: Cannot create decompress\n");
@@ -243,12 +243,12 @@ void decompress( const char* compressed, char* codebook){
 		//int val = atoi(ptr->name);
 			//printf("ptrname:[%s]  buffer[0]:[%c]\n", ptr->name, buffer[0]);
 			if(buffer[0]=='0' ){
-				printf("left\n");
+				//printf("left\n");
 				ptr=ptr->left;
 				
 			}
 			else if(buffer[0]=='1' ){
-				printf("right\n");
+				//printf("right\n");
 				
 				ptr=ptr->right;
 				
@@ -266,10 +266,10 @@ void decompress( const char* compressed, char* codebook){
 		
 		
 			
-			printf("ptr->name: %s", ptr->name);
+			//printf("ptr->name: %s", ptr->name);
 			int toklen = strlen(ptr->name);
 			int written = write(id, ptr->name, toklen);
-			printf("written:%d", written);
+			//printf("written:%d", written);
 //printf("written: %d", written);
 			if(written <1){
 				printf("Error Write to file failed in Decompress\n");
@@ -285,16 +285,7 @@ void decompress( const char* compressed, char* codebook){
 	close(id);
 
 }
-int main(int argc, char** argv){
-	if(argc<2){
-		printf("error");
-		return 0;
-	}
-	//struct HeapNode* head=NULL;
-	//head=treeFromCBook(head, argv[2]);
-	decompress(argv[1], argv[2]);
-	return 0;
-}
+
 
 
 

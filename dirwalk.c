@@ -12,6 +12,7 @@
 void listdir(int flag, const char* dirname);
 void openfiles(const char* filename);
 int is_directory(const char *dir);
+int isFile(char *to_read) ;
 void writefiles(const char* filename);
 //add parameters: boolean int to signify if there are flags happening/how many flags and string containing the flags to call 
 int main (int argc, char**argv){
@@ -176,6 +177,30 @@ void writefiles(const char* filename){
     fclose(fp); 
 */
 }
+int isFile(char *to_read) {
+
+  struct stat s;
+  if(stat(to_read, &s) == 0) {
+
+    if(s.st_mode & S_IFDIR) {
+      return 0;
+    } else if(s.st_mode & S_IFREG) {
+      return 1;
+    } else {
+      printf("Error, not found\n");
+      return 3;
+    }
+
+  } else {
+
+
+    return 3;
+  }
+}
+
+
+
+
 /*
 pass in the initial directory name, and this should not be changed
 open the pass in directory 

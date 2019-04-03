@@ -4,9 +4,10 @@ Overall Algorithm:
 	If input is proper, perform what the flags say. If there is a -R, then call the recursive function that walks through the directory. When a file is reached, call the method for the appropriate flag. (Call compressor if given -c decompressor for -d, build for -b). 
 
 
-Recursion:
+Recursion: 
+	Called listdir.c 
 	Takes in flags as an int representation (1=b, 2=c, 3=d). Opens the directory path if it was a valid path to a directory. The program traverses through each file/folder in the directory and that level and concatnates the directory name to a string called path. When a directory is found, a recursive call is made by sending in that directory. When a file is reached, the path that is created for that file is passed in as a parameter to the given flag's function. 
-	
+	if the path is a directory then there is a while loop that searches through all the files/directories inside the parent directory. if another directory is found, recursion is called again. If a file is found then the method called is applied. 
 Build Code Book:
 	Structures Used:
 		Hashtables - Used to store tokens and update their frequency while files are being parsed

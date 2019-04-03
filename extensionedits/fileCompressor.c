@@ -1,12 +1,87 @@
-#include <stdlib.h>
+
 #include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 #include <string.h>
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include "fileCompressor.h"
+#include <ctype.h>
+
+
+struct HashNode{
+	char* token;
+	int key;
+	int frequency;
+	struct HashNode* next;
+};
+struct HeapNode{
+	int frequency;
+	char* name;//token gathered
+	int height;
+	struct HeapNode* left;
+	struct HeapNode* right;
+};
+struct LLNode{
+	struct HeapNode* Tree;
+	struct LLNode* next;
+	};
+
+
+
+struct HashNode* HashTable[10000];
+//main
+void error(int err);
+build();
+void deallocate(struct HashNode* head);
+//dirwalk
+void listdir(int flag, const char* dirname, const char* codebook);
+void openfiles(const char* filename);
+int is_directory(const char *dir);
+void writefiles(const char* filename);
+
+//compress
+char* getNextToken(char* filename, int size, int offset);
+int compress(char* tocompress, char* codebook);
+char* retcode(char* tofind, char* codebook);
+int isFile(char *to_read) ;
+
+//decompress
+void decompress(char* codebook, char* decompressed);
+char* itoa(int num, char* str, int base) ;
+
+//treefromcbook
+struct HeapNode* treeFromCBook(struct HeapNode* head, char* codebook);
+struct HeapNode* insertEntry(struct HeapNode* head, char* directions, char* token, int index);
+
+//hashmap.c
+struct HashNode* makeHashNode(char* string);
+int getKey(char* string);
+void addNode(struct HashNode** HashTable,char** string);//*
+int seek(struct HashNode** HashTable,char* string);
+void deallocate(struct HashNode* head);
+
+//buildhtree
+struct HeapNode* makeTree(struct HeapNode* head, struct HeapNode* smaller, struct HeapNode* larger);
+struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHead, int numToks);
+struct LLNode* makeNode(struct LLNode* newNode, struct HeapNode* tree);
+struct HeapNode* makeHeapNode(struct HeapNode* node, int freq, char* token);
+void delete(struct LLNode **head, char* Name);
+void insert(struct LLNode **head, struct HeapNode **tree, int freq);
+//void freeNodes(struct LLNode *head);
+void freeTree(struct HeapNode* headTree);
+void printTree(struct HeapNode* node);
+void printLL(struct LLNode *head);
+
+//heapsort
+void swap(struct HeapNode** arr, int size, int largest);
+void heapify(struct HeapNode** arr, int size, int i);
+struct HeapNode* hashToArr(struct HashNode** HashTable, int numToks);
+
+
+
 
 
 int main(int argc, char** argv){
@@ -37,7 +112,7 @@ int main(int argc, char** argv){
 	// possibilities: brp, rbp, cfc, dfc
 	if(argc == 4){
 		// build recurse, recurse build
-		if ((strcmp(argv[1], "-r")==0 && strcmp(argv[2], "-b")==0 )|| (strcmp(argv[1], "-b")==0 && strcmp(argv[2], "-r")==0)){
+		if ((strcmp(argv[1], "-R")==0 && strcmp(argv[2], "-b")==0 )|| (strcmp(argv[1], "-b")==0 && strcmp(argv[2], "-R")==0)){
 			if(is_directory(argv[3])){
 				listdir(1, argv[3], NULL);
 			}
@@ -66,7 +141,7 @@ int main(int argc, char** argv){
 	}
 	// crpc, rcpc, drpc, rdpc
 	if(argc == 5){
-		if ((strcmp(argv[1], "-r")==0 && strcmp(argv[2], "-c")==0 )|| (strcmp(argv[1], "-c")==0 && strcmp(argv[2], "-r")==0)){
+		if ((strcmp(argv[1], "-R")==0 && strcmp(argv[2], "-c")==0 )|| (strcmp(argv[1], "-c")==0 && strcmp(argv[2], "-R")==0)){
 			if(is_directory(argv[3]) && isFile(argv[4])){
 				listdir(2, argv[3], argv[4]);
 			}
@@ -75,7 +150,7 @@ int main(int argc, char** argv){
 			}
 
 		}
-		else if ((strcmp(argv[1], "-r")==0 && strcmp(argv[2], "-d")==0 )|| (strcmp(argv[1], "-d")==0 && strcmp(argv[2], "-r")==0)){
+		else if ((strcmp(argv[1], "-R")==0 && strcmp(argv[2], "-d")==0 )|| (strcmp(argv[1], "-d")==0 && strcmp(argv[2], "-R")==0)){
 			if(is_directory(argv[3]) && isFile(argv[4]) ){
 				listdir(3, argv[3], argv[4]);
 			}
@@ -704,82 +779,6 @@ freeTree(treehead);
 
 }
 
-
-int isFile(char *to_read) {
-
-  struct stat s;
-  if(stat(to_read, &s) == 0) {
-
-    if(s.st_mode & S_IFDIR) {
-      return 0;
-    } else if(s.st_mode & S_IFREG) {
-      return 1;
-    } else {
-      printf("Error, not found\n");
-      return -7;
-    }
-
-  } else {
-
-
-    return -6;
-  }
-}
-char* getNextToken(char* filename, int size, int offset){
-    if(size ==0){
-        return "3";
-    }
-    int fd= open(filename, O_RDONLY);
-    int l= lseek(fd, offset, SEEK_SET);
-    char* token= NULL;
-    token = (char*)malloc(10*sizeof(char));
-    if(token == NULL){
-    printf("Malloc failed to get next token\n");
-    return "3";
-    }
-    char* tempchar = (char*) malloc(2 * sizeof(char));
-    if(tempchar == NULL){
-    printf("Malloc failed in get next token\n");
-    return "3";
-    }
-    int tokcounter =0;
-    token[0] = '\0';
-    int tokensize = sizeof(token);
-    while(read(fd, tempchar,1 )){
-        if(sizeof(token)-strlen(token) >=2){
-        strcat(token, tempchar);
-       }
-       else{
-       	tokensize = sizeof(token);
-        char* temp = (char*) realloc(token , (tokensize+10) * sizeof(char) );
-        if(temp ==NULL){
-            printf("Error: Cannot malloc space for token\n");
-            return "3";
-        }
-        else{
-            token = temp;
-            strcat(token, tempchar);
-        }
-        
-       }
-        
-int tempcharint = tempchar[0];
-        if( tempchar[0]==' '|| iscntrl( tempchar[0])>0) {
-            close(fd);
-            return token; 
-            break;   
-        }
-        if(tokcounter+1 == size ){
-           free(tempchar);
-            close(fd);
-            return token;
-        }
-        tokcounter++;
-    }
-free(token);
-return "3";
-
-}
 int getKey(char* string){
 	int key=0;
 	int sum=0;
@@ -842,16 +841,6 @@ int seek(char* string){
 	return absent;
 }
 
-void deallocate(struct HashNode* head){
-	if(head==NULL){
-		return;
-	}
-	else{
-		deallocate(head->next);
-	}
-	free(head);
-	return;
-}
 struct HeapNode* hashToArr(){
 	struct HeapNode* heapArr=(struct HeapNode*)malloc(numToks*sizeof(struct HeapNode));
 	int i=0;//keeps track of hashtable index
@@ -1272,16 +1261,6 @@ void freeNodes(struct LLNode *head){
 	return;
 }
 
-struct HeapNode* makeHeapNode(struct HeapNode* node, int freq, char* token){
-	node=(struct HeapNode*)malloc(sizeof(struct HeapNode)*1);
-	node->name=token;
-	
-	node->frequency=freq;
-	node->left=NULL;
-	node->right=NULL;
-	node->height=1;
-	return node;
-}
 
 void buildCBook(struct HeapNode* hufftree){//ADD:  const char* pathname
 		int fd=open("./HuffmanCodebook", O_WRONLY | O_CREAT, 00644);
@@ -1482,22 +1461,4 @@ int is_directory(const char *directory) {
 }
 
 
-char* itoa(int num, char* str) 
-{ 
-    int i = 0; 
-    int isNeg = 0; 
-    if (num == 0) 
-    { 
-        str[i++] = '0'; 
-        str[i] = '\0'; 
-        return str; 
-    } 
-    while (num != 0) 
-    { 
-        int rem = num % 10; 
-        str[i++] = (rem > 9)? (rem-10) + 'a' : rem + '0'; 
-        num = num/10; 
-    } 
-    str[i] = '\0'; 
-    return str; 
-}
+

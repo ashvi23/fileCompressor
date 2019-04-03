@@ -7,7 +7,7 @@ Overall Algorithm:
 
 
 Recursion:
-	Takes in flags as an int representation (1=b, 2=c, 3=d). Opens the directory path if it was a valid path to a directory. The program traverses through each file/folder in the directory and that level and concatnates the directory name to a string called path. When a directory is found, a recursive call is made by sending in that directory. When a file is reached, the path that is created for that file is passed in as a parameter to the given flag's function. 
+	Takes in flags as an int representation (1=b, 2=c, 3=d). Opens the directory path if it was a valid path to a directory. The program traverses through each file/folder in the directory and that level and concatnates the directory name to a string called path. There is a while loop inside the method, that searches thorugh the directory given (while readdir). When a directory is found, a recursive call is made by sending in that directory. When a file is reached, the path that is created for that file is passed in as a parameter to the given flag's function. 
 	
 Build Code Book:
 	Structures Used:
@@ -64,7 +64,13 @@ Time Complexity: (t is the number of tokens in the file mentioned)
 			Searching the tree: t*
 			Writing decompressed file: O(t)
 	Recurse:
-			
+		d - # of directories(dt_reg + dt_dir)
+			while loop: O(d)
+				- goes through all of the directories(dt_reg + dt_dir) in a folder
+			recursive call
+			if dt_reg
+				O() of the function that is being called (O(compress), O(decompress) O(buildCodebook))
+		
 
 Space Complexity: (t is the number of tokens in the file entered)
 	Hashtable: Static array of size 10000, with t many nodes hanging off of it.

@@ -8,7 +8,7 @@
 #include "fileCompressor.h"
 
 
-int isFile(char *to_read) {
+int isFile( const char *to_read) {
   struct stat s;
   if(stat(to_read, &s) == 0) {
 
@@ -84,23 +84,7 @@ return "3";
 
 }
 //struct node
-struct HeapNode{
-	int frequency;
-	char* name;//token gathered
-	int height;
-	struct HeapNode* left;
-	struct HeapNode* right;
-};
 
-//new node
-struct HeapNode* makeHeapNode(struct HeapNode* node , int freq, char* token){
-	node=(struct HeapNode*)malloc(sizeof(struct HeapNode)*1);
-	node->name=token;
-	node->frequency=freq;
-	node->left=NULL;
-	node->right=NULL;
-	return node;
-}
 //insert node
 struct HeapNode* insertEntry(struct HeapNode* head, char* directions, char* token, int index){	
 	if(head==NULL){
@@ -172,7 +156,7 @@ struct HeapNode* treeFromCBook(struct HeapNode* head, char* codebook){
 	return head;
 }
 
-void decompress( const char* compressed, char* codebook){
+void decompress(  char* compressed, char* codebook){
 	//is file codebook and compressed
 	//create struct head 
 	struct HeapNode* head= NULL;
@@ -276,7 +260,7 @@ void decompress( const char* compressed, char* codebook){
 
 }
 
-void freeTree(struct HeapNode* headTree){
+void freeTree(struct HeapNode* head){
 	if(head==NULL){
 		return;
 	}

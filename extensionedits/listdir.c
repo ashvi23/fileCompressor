@@ -12,7 +12,20 @@
 int numToks;
 struct HashNode* HashTable[10000];
 
-
+void printHash();
+void printHash(){
+int i =0;
+for(i =0; i< 10000; i++){
+if(HashTable[i] !=NULL){
+	struct HashNode* ptr = HashTable[i];
+	printf("Hash[%d]:[%s] [%d]",i , HashTable[i]->token, HashTable[i]->frequency);
+	while(ptr->next!= NULL){
+		printf("[%s] freq:[%d] ", ptr->token ,ptr->frequency);
+	}
+	printf("\n");
+}
+}
+}
 int main (int argc, char**argv){
 int i=0;
 	for(i=0; i<10000; i++){
@@ -39,6 +52,7 @@ int i=0;
 
 void listdir(int flag, const char* dirname, const char* codebook){
 //printf("");
+//given a file path not a directory 
 if(isFile(dirname)){
 printf("warning: a file is sent to recurse\n");
       if(flag ==1){
@@ -60,7 +74,7 @@ else {
 	DIR* currdir = opendir(dirname);
 	printf("path: %s\n", dirname);
     struct dirent *dir_info;
-    if(!currdir){
+    if(currdir==NULL){
         printf("Error: Cannot open directory\n");
         return;
     }
@@ -92,28 +106,43 @@ else {
             if(strncmp(dir_info->d_name, ".", sizeof(char))==0){
                 continue;
             }
+            
+            
+            
+            
             //is directory
             else if(dir_info->d_type == DT_DIR){
             printf("path %s\n", path);
                 listdir(flag, path, codebook);
             }
+            
+            
+            
+            
+            
             //is file
             else if(dir_info->d_type == DT_REG){
             
 				   if(flag ==1){
-			  printf("BUILD: %s\n",path );
 				        	build(0, path);
 				  printf("DONE BUILD: %s\n",path );
+				 
 				        }
 				        else if(flag == 2){
 				          printf("compre build\n");
+				          
 					compress(path, codebook);
 				}
 				else if(flag == 3){
 				  printf("decompr\n");
+				 
 					//decompress(path, codebook);
 				}
             }
+            
+            
+            
+            
             //error check
             else if(dir_info->d_type == DT_UNKNOWN){
                 printf("Error: Directory type is unknown\n");
@@ -123,12 +152,17 @@ else {
         }
 	
     }
+    printHash();
     if (flag == 1){
 	printf("hello outside\n");
 		struct HeapNode* sortedHeapHead=NULL;
+		printf(" 5hello outside\n");
 		sortedHeapHead= hashToArr();
+		printf("4 hello outside\n");
 		struct HeapNode *treehead = buildhTree(sortedHeapHead, treehead);
-		buildCBook(treehead);  
+		printf("1 hello outside\n");
+		buildCBook(treehead); 
+		printf("2 hello outside\n"); 
 	}
     closedir(currdir);
     //}
@@ -458,6 +492,7 @@ if(iscntrl(tofind[0]) >0 || tofind[0] == ' '){
 //end of build codebook methods
 void build(int isfile, const char* filename){ //FOR TESTING PURPOSES ONLY
 	// get size of file, getnexttoken, send into hashmap 
+	printf("in build! is file: %d, path:%s\n", isfile, filename);
 	struct HeapNode *treehead  = NULL;
 	
 	if(isFile(filename) ==1){
@@ -472,7 +507,7 @@ void build(int isfile, const char* filename){ //FOR TESTING PURPOSES ONLY
 		int tokenlength =0;
 		int absent = 0;
 		char* delim;
-		numToks =0;
+		//numToks =0;
 		while(readbytes<size){
 		char* token = getNextToken(filename, size - readbytes, readbytes);
 		if(strcmp(token, "3")==0){
@@ -500,18 +535,20 @@ void build(int isfile, const char* filename){ //FOR TESTING PURPOSES ONLY
                 }
             }
             absent =seek(token);
+            printf("absent: %d   \n",absent);
             if(absent == 1){
             	addNode(&token);
             	numToks = numToks+1; //increments by size of pointer 
-            
+            printf("numToks++: %d\n",  numToks); 
             }
-            
+        	   
 
             absent =seek(delim);
             if(absent == 1){
             	addNode(&delim);
-            	numToks = numToks+1;
             	
+            	numToks = numToks+1;
+            	printf("token updated in build, numToks++: %d\n",  numToks); 
             } 
          if(readbytes == size){
          break;
@@ -648,12 +685,12 @@ struct HeapNode* hashToArr(){
         heapify(&heapArr, i, 0); 
 	//***************************************************************************************************
     } 
-
+	printf("numToks in hashtoArr: %d\n", numToks);
 	return heapArr;
 }
 
 void heapify(struct HeapNode** arr, int size, int i) { 
-	
+	printf("NUMTOKS: %d\n", numToks);
 	int sizeArr=(sizeof((**arr))/sizeof((*arr[0])));
 	
     int largest = i; // Initialize largest as root 
@@ -696,6 +733,11 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 	int size=numToks;//numToks is total number of tokens inserted into hashtable
 	int count=0;
 	struct LLNode* LLptr=NULL;
+	
+	int i=0;
+	for(i=0; i<size; i++){//DELETE ME!!!!!!!!!!!!
+			printf("at index %d, [%s][%d]\n", i, sortedArr[i].name, sortedArr[i].frequency);
+		}
 	
 	if(numToks==1){
 		struct HeapNode* holdNode=makeHeapNode(holdNode, sortedArr[0].frequency, sortedArr[0].name);
@@ -881,9 +923,14 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 }
 
 void printTree(struct HeapNode* node){
-	 if (node == NULL) 
+
+	 if (node == NULL) {
+    printf("null in print\n");
           return; 
-   
+   }
+   if(node!= NULL){
+   	printf("head: [%s] \n  ",node->name );
+     }
      printTree(node->left); 
  
   
@@ -893,6 +940,7 @@ void printTree(struct HeapNode* node){
 
 
 struct HeapNode* makeTree(struct HeapNode* head, struct HeapNode* smaller, struct HeapNode* larger, int* count){
+printf("in MakeTree\n");
 		head=(struct HeapNode*)malloc(1*sizeof(struct HeapNode));
 		head->frequency= (smaller->frequency)+(larger->frequency);
 		int digits=0;
@@ -913,6 +961,10 @@ struct HeapNode* makeTree(struct HeapNode* head, struct HeapNode* smaller, struc
 			head->height=(smaller->height)++;
 		}
 		(*count)++;
+		printf("Head: %s  ", head->name);
+		printf("smaller: [%s] [%d]  ", smaller->name, smaller->frequency);
+		printf("larger: [%s] [%d] \n", larger->name, larger->frequency);
+		printTree(head);
 		return head;
 		}
 

@@ -11,7 +11,7 @@
 
 
 
-int isFile(char *to_read) {
+int isFile(const char *to_read) {
 
   struct stat s;
   if(stat(to_read, &s) == 0) {

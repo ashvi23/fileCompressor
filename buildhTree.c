@@ -13,8 +13,8 @@ struct HeapNode{
 	struct HeapNode* left;
 	struct HeapNode* right;
 };
-
-struct HeapNode* makeTree(struct HeapNode* head, struct HeapNode* smaller, struct HeapNode* larger);
+char* itoa(int num, char* str) ;
+struct HeapNode* makeTree(struct HeapNode* head, struct HeapNode* smaller, struct HeapNode* larger, int* count);
 struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHead, int numToks);
 struct LLNode* makeNode(struct LLNode* newNode, struct HeapNode* tree);
 struct HeapNode* makeHeapNode(struct HeapNode* node, int freq, char* token);
@@ -23,6 +23,26 @@ void insert(struct LLNode **head, struct HeapNode **tree, int freq);
 void freeNodes(struct LLNode *head);
 void printTree(struct HeapNode* node);
 void printLL(struct LLNode *head);
+
+char* itoa(int num, char* str) 
+{ 
+    int i = 0; 
+    int isNeg = 0; 
+    if (num == 0) 
+    { 
+        str[i++] = '0'; 
+        str[i] = '\0'; 
+        return str; 
+    } 
+    while (num != 0) 
+    { 
+        int rem = num % 10; 
+        str[i++] = (rem > 9)? (rem-10) + 'a' : rem + '0'; 
+        num = num/10; 
+    } 
+    str[i] = '\0'; 
+    return str; 
+} 
 
 int main(int argc, char** argv){
 	struct HeapNode* sortedArr=(struct HeapNode*) malloc(sizeof(struct HeapNode)*6);
@@ -86,6 +106,7 @@ int main(int argc, char** argv){
 
 struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHead, int numToks){
 	int size=numToks;
+	int count=0;
 	printf("SIZE OF ARR: %d\n", size);
 	struct LLNode* LLptr=NULL;
 	
@@ -101,7 +122,7 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 	struct HeapNode* second=makeHeapNode(second,sortedArr[1].frequency, sortedArr[1].name);
 	//struct HeapNode*
 	int index=2; //took first two vals in arr, now at index 2
-	heapHead=makeTree(heapHead, first, second);
+	heapHead=makeTree(heapHead, first, second, &count);
 	insert(&head, &heapHead, heapHead->frequency);
 	LLptr=head;
 	printf("index: %d, numToks:%d \n", index, numToks);
@@ -165,7 +186,7 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 					printf("name, frequency in second pos: %d, %s\n",( LLptr->Tree->frequency), (LLptr->Tree->name) );
 					newfirst=makeHeapNode(newfirst, sortedArr[index].frequency,  sortedArr[index].name);
 					//newsecond=makeTree(newsecond, LLptr->Tree->left, LLptr->Tree->right);//wronk
-					heapHead=makeTree(heapHead, newfirst, LLptr->Tree);
+					heapHead=makeTree(heapHead, newfirst, LLptr->Tree, &count);
 					insert(&LLptr, &heapHead, heapHead->frequency);
 					printf("Before deletion:\n");
 					printLL(LLptr);
@@ -180,7 +201,7 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 					printf("name, frequency in second pos: %d, %s\n",(sortedArr[index+1].frequency), (sortedArr[index+1].name) );
 					newfirst=makeHeapNode(newfirst, sortedArr[index].frequency, sortedArr[index].name);
 					newsecond=makeHeapNode(newsecond,sortedArr[index+1].frequency,sortedArr[index+1].name);
-					heapHead=makeTree(heapHead, newfirst, newsecond);
+					heapHead=makeTree(heapHead, newfirst, newsecond, &count);
 					insert(&LLptr, &heapHead, heapHead->frequency);	
 					printf("After insertion, no deletion:\n");
 					printLL(LLptr);
@@ -197,7 +218,7 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 					
 					//newfirst=makeTree(newfirst, LLptr->Tree->left, LLptr->Tree->right);//newfirst, LLptr->Tree->frequency, LLptr->Tree->name);
 					//newsecond=makeHeapNode(newsecond, LLptr->next->Tree->left, LLptr->next->Tree->right);//newsecond,LLptr->next->Tree->frequency,LLptr->next->Tree->name);
-					heapHead=makeTree(heapHead, LLptr->Tree, LLptr->next->Tree);
+					heapHead=makeTree(heapHead, LLptr->Tree, LLptr->next->Tree, &count);
 					insert(&LLptr, &heapHead, heapHead->frequency);
 					printf("\nBefore deletions:\n");
 					printLL(LLptr);
@@ -213,7 +234,7 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 				printf("name, frequency in second pos: %d, %s\n",(sortedArr[index].frequency), (sortedArr[index].name) );
 				//newfirst=makeHeapNode(newsecond, LLptr->Tree->left, LLptr->Tree->right);//newfirst, LLptr->Tree->frequency, LLptr->Tree->name);
 				newsecond=makeHeapNode(newsecond, sortedArr[index].frequency, sortedArr[index].name);
-				heapHead=makeTree(heapHead, LLptr->Tree, newsecond);
+				heapHead=makeTree(heapHead, LLptr->Tree, newsecond, &count);
 				insert(&LLptr, &heapHead, heapHead->frequency);
 				index++;
 				printf("\nBefore deletion:\n");
@@ -330,18 +351,24 @@ void printTree(struct HeapNode* node){
 }
 
 
-struct HeapNode* makeTree(struct HeapNode* head, struct HeapNode* smaller, struct HeapNode* larger){
+struct HeapNode* makeTree(struct HeapNode* head, struct HeapNode* smaller, struct HeapNode* larger, int* count){
 		printf("IN MAKETREE\n\n");
 		head=(struct HeapNode*)malloc(1*sizeof(struct HeapNode));
 		head->frequency= (smaller->frequency)+(larger->frequency);
-		int sumNames=strlen(smaller->name)+strlen(larger->name);
-		printf("sumNames:%d\n\n", sumNames);
-		char* headName= (char*)malloc(sizeof(char)*(sumNames+1));
+		//int sumNames=strlen(smaller->name)+strlen(larger->name);
+		//printf("sumNames:%d\n\n", sumNames);
+		int digits=0;
+		int count2=*count;
+		do{
+			count2/=10;
+			digits++;
+		}while(count2!=0);
+		char* headName= (char*)malloc(sizeof(char)*(digits+1));
 		headName[0]='\0';
-		strcat(headName,larger->name);
-		strcat(headName,smaller->name);
+		head->name=itoa(*count, headName);
+		//strcat(headName,smaller->name);
 		printf("HELLO\n\n");
-		head->name=headName;
+		
 		head->left=smaller;
 		printf("INSERTING SMALLER\n");
 		printTree(smaller);
@@ -354,6 +381,7 @@ struct HeapNode* makeTree(struct HeapNode* head, struct HeapNode* smaller, struc
 		}
 		printf("INSERTING LARGER\n");
 		printTree(larger);
+		(*count)++;
 		return head;
 		}
 

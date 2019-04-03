@@ -7,4 +7,5 @@ fileCompressor: fileCompressor.c fileCompressor.h
 	$(CC) $(CCFLAGS) -g -lm -o fileCompressor fileCompressor.c fileCompressor.h 
 	
 clean:
-	rm fileCompressor
+	rm -rf fileCompressor
+	rm -rf HuffmanCodebook

@@ -34,13 +34,13 @@ struct HashNode* HashTable[10000];
 void error(int err);
 void deallocate(struct HashNode* head);
 //dirwalk
-void listdir(int flag, char* dirname, const char* codebook);
-void openfiles(const char* filename);
+void listdir(int flag, const char* dirname, const char* codebook);
+void openfiles(char* filename);
 int is_directory(const char *dir);
-void writefiles(const char* filename);
+void writefiles(char* filename);
 
 //compress
-char* getNextToken(const char* filename, int size, int offset);
+char* getNextToken( char* filename, int size, int offset);
 int compress(char* tocompress, char* codebook);
 char* retcode(char* tofind, char* codebook);
 int isFile(const char *to_read) ;
@@ -79,5 +79,5 @@ void buildCBook(struct HeapNode* hufftree);
 void swap(struct HeapNode** arr, int size, int largest);
 void heapify(struct HeapNode** arr, int size, int i);
 struct HeapNode* hashToArr();
-void build(const char* filename);
+void build(int isrecurse , const char* filename);
 

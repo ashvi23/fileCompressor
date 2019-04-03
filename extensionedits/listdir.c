@@ -1,25 +1,36 @@
 #include <stdlib.h>
 #include <stdio.h>
-//#include <sys/types.h>
 #include <string.h>
-//#include <errno.h>
 #include <dirent.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <ctype.h>
 #include "fileCompressor.h"
 
+int numToks;
+struct HashNode* HashTable[10000];
 
 
 int main (int argc, char**argv){
+int i=0;
+	for(i=0; i<10000; i++){
+			HashTable[i]=NULL;
+	}
+	int* numToks =0;
  	int flag = argv[1][0] -48;
-   if (is_directory(argv[2])) {
+ 	 if(isFile(argv[2])){
+       // printf("warning: file sent in\n");
+        listdir(flag , argv[2], argv[3]);
+    }
+  else  if (is_directory(argv[2])) {
         printf("yes\n");
      
       	
         listdir(flag, argv[2], argv[3]);
     }
-    else if(isFile(argv[2])){
-       // printf("warning: file sent in\n");
-        listdir(flag , argv[2], argv[3]);
-    }
+   
     else{
       printf("no\n"); 
       }
@@ -27,19 +38,20 @@ int main (int argc, char**argv){
     }
 
 void listdir(int flag, const char* dirname, const char* codebook){
+//printf("");
 if(isFile(dirname)){
 printf("warning: a file is sent to recurse\n");
       if(flag ==1){
       printf("build\n");
-                	build(1, path);
+                	//build(1, argv[2]);
                 }
                 else if(flag == 2){
               //    printf("compre build\n");
-			compress(path, codebook);
+			compress(dirname, codebook);
 		}
 		else if(flag == 3){
 		 // printf("decompr\n");
-			decompress(path, codebook);
+			//decompress(argv[2], argv[3]);
 		}
 		return;
 }
@@ -89,7 +101,7 @@ else {
             
 				   if(flag ==1){
 			  printf("BUILD: %s\n",path );
-				        	build(1, path);
+				        //	build(1, path);
 				        }
 				        else if(flag == 2){
 				          printf("compre build\n");
@@ -97,7 +109,7 @@ else {
 				}
 				else if(flag == 3){
 				  printf("decompr\n");
-					decompress(path, codebook);
+					//decompress(path, codebook);
 				}
             }
             //error check
@@ -141,16 +153,16 @@ int isFile(const char *to_read) {
       return 1;
     } else {
       printf("Error, not found\n");
-      return 3;
+      return 0;
     }
 
   } else {
 
 
-    return 3;
+    return 0;
   }
 }
-char* getNextToken(char* filename, int size, int offset){
+char* getNextToken(const char* filename, int size, int offset){
     if(size ==0){
         return "3";
     }
@@ -433,3 +445,14 @@ if(iscntrl(tofind[0]) >0 || tofind[0] == ' '){
         return "3";
 
 }
+//end of compress, retcode, getnexttoken, is_directory, isFile, listdir
+//*********************************************************************************************************************************************************
+
+
+//end of build codebook methods
+
+//*****************************************************************************************************************************************************************************************************************
+
+
+
+

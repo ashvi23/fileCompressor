@@ -34,8 +34,8 @@ struct LLNode{
 
 struct HashNode* HashTable[10000];
 //main
-void error(int err);
-build();
+void error(int err); //1
+void build(int flag, char*);
 void deallocate(struct HashNode* head);
 //dirwalk
 void listdir(int flag, const char* dirname, const char* codebook);
@@ -47,7 +47,7 @@ void writefiles(const char* filename);
 char* getNextToken(char* filename, int size, int offset);
 int compress(char* tocompress, char* codebook);
 char* retcode(char* tofind, char* codebook);
-int isFile(char *to_read) ;
+int isFile(const char *to_read) ;
 
 //decompress
 void decompress(char* codebook, char* decompressed);
@@ -62,7 +62,6 @@ struct HashNode* makeHashNode(char* string);
 int getKey(char* string);
 void addNode(struct HashNode** HashTable,char** string);//*
 int seek(struct HashNode** HashTable,char* string);
-void deallocate(struct HashNode* head);
 
 //buildhtree
 struct HeapNode* makeTree(struct HeapNode* head, struct HeapNode* smaller, struct HeapNode* larger);
@@ -79,6 +78,6 @@ void printLL(struct LLNode *head);
 //heapsort
 void swap(struct HeapNode** arr, int size, int largest);
 void heapify(struct HeapNode** arr, int size, int i);
-struct HeapNode* hashToArr(struct HashNode** HashTable, int numToks);
+struct HeapNode* hashToArr();
 
 #endif

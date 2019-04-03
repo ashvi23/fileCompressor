@@ -11,25 +11,6 @@
 //keep track of the number of words added to hahstable accross all files
 int numToks;
 struct HashNode* HashTable[10000];
-struct HashNode{
-	char* token;
-	int key;
-	int frequency;
-	struct HashNode* next;
-};
-struct HeapNode{
-	int frequency;
-	char* name;//token gathered
-	int height;
-	struct HeapNode* left;
-	struct HeapNode* right;
-};
-struct LLNode{
-	struct HeapNode* Tree;
-	struct LLNode* next;
-	};
-
-
 
 int main(int argc, char** argv){
 	//struct HashNode* HashTable[10000];
@@ -42,9 +23,11 @@ int main(int argc, char** argv){
 	return 0;
 
 }
-void build(char* filename){ //FOR TESTING PURPOSES ONLY
+void build(const char* filename){ //FOR TESTING PURPOSES ONLY
 	// get size of file, getnexttoken, send into hashmap 
-	if(isFile(filename) == 1){
+	struct HeapNode *treehead  = NULL;
+	
+	if(isFile(filename) ==1){
 		int fd = open(filename, O_RDONLY);
 		if(fd == -1){
 			printf("error\n");
@@ -108,7 +91,7 @@ void build(char* filename){ //FOR TESTING PURPOSES ONLY
 		//heap done. create tree
 		
 		printTree(sortedHeapHead);
-		struct HeapNode *treehead = buildhTree(sortedHeapHead, treehead, numToks);
+		treehead = buildhTree(sortedHeapHead, treehead);
 
 		
 		printTree(treehead);
@@ -119,15 +102,14 @@ void build(char* filename){ //FOR TESTING PURPOSES ONLY
 		
 	}	
 	else{
-		printf("error not a file \n");
+		printf("error not a file %d\n", isFile(filename));
 		return;
 	}
 freeTree(treehead);
 
 }
 
-
-int isFile(char *to_read) {
+int isFile(const char *to_read) {
 
   struct stat s;
   if(stat(to_read, &s) == 0) {
@@ -138,16 +120,16 @@ int isFile(char *to_read) {
       return 1;
     } else {
       printf("Error, not found\n");
-      return -7;
+      return 0;
     }
 
   } else {
 
 
-    return -6;
+    return 0;
   }
 }
-char* getNextToken(char* filename, int size, int offset){
+char* getNextToken( char* filename, int size, int offset){
     if(size ==0){
         return "3";
     }
@@ -351,7 +333,7 @@ void swap(struct HeapNode** arr, int size, int largest){
 	}
 	
 
-struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHead, int numToks){
+struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHead){
 	int size=numToks;//numToks is total number of tokens inserted into hashtable
 	int count=0;
 	struct LLNode* LLptr=NULL;
@@ -417,7 +399,7 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 					//newsecond=makeTree(newsecond, LLptr->Tree->left, LLptr->Tree->right);//wronk
 					heapHead=makeTree(heapHead, newfirst, LLptr->Tree, &count);
 					insert(&LLptr, &heapHead, heapHead->frequency);
-					delete(&LLptr, (LLptr->Tree->name));//delete LLNode used
+					deleteLL(&LLptr, (LLptr->Tree->name));//delete LLNode used
 					index++;//imcrement through the minHeap
 					break;
 				case 2:
@@ -434,8 +416,8 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 				case 4:
 					heapHead=makeTree(heapHead, LLptr->Tree, LLptr->next->Tree, &count);
 					insert(&LLptr, &heapHead, heapHead->frequency);
-					delete(&LLptr->next, (LLptr->next->Tree->name));//delete LLNode used
-					delete(&LLptr, (LLptr->Tree->name));//delete LLNode used
+					deleteLL(&LLptr->next, (LLptr->next->Tree->name));//delete LLNode used
+					deleteLL(&LLptr, (LLptr->Tree->name));//delete LLNode used
 					break;
 				case 5:
 				case 6:
@@ -444,7 +426,7 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 				heapHead=makeTree(heapHead, LLptr->Tree, newsecond, &count);
 				insert(&LLptr, &heapHead, heapHead->frequency);
 				index++;
-				delete(&LLptr, (LLptr->Tree->name));//delete LLNode used
+				deleteLL(&LLptr, (LLptr->Tree->name));//delete LLNode used
 				break;
 
 
@@ -484,7 +466,7 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 					index++;
 					printf("\nBefore deletion:\n");
 					printLL(LLptr);
-					delete(&LLptr, (LLptr->Tree->name));//delete LLNode used
+					deleteLL(&LLptr, (LLptr->Tree->name));//delete LLNode used
 					printf("\nAfter deletion:\n");
 					printLL(LLptr);	
 					printf("\nReturned\n");
@@ -499,8 +481,8 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 					insert(&LLptr, &heapHead, heapHead->frequency);
 					printf("\nBefore deletions:\n");
 					printLL(LLptr);
-					delete(&LLptr->next, (LLptr->next->Tree->name));//delete LLNode used
-					delete(&LLptr, (LLptr->Tree->name));//delete LLNode used
+					deleteLL(&LLptr->next, (LLptr->next->Tree->name));//delete LLNode used
+					deleteLL(&LLptr, (LLptr->Tree->name));//delete LLNode used
 					printf("\nAfter deletions:\n");
 					printLL(LLptr);
 				}
@@ -652,7 +634,7 @@ struct LLNode *node= NULL;
 	return;	//implicit that you do nothing if temp1==data	
 	}
 //to delete a node in the LL
-void delete(struct LLNode **head, char* Name){
+void deleteLL(struct LLNode **head, char* Name){
 	struct LLNode *temp1=(*head);
 		if((*head)==NULL){
 			//printf("hello 2!\n");
@@ -764,7 +746,7 @@ struct HeapNode* makeHeapNode(struct HeapNode* node, int freq, char* token){
 	return node;
 }
 
-void buildCBook(struct HeapNode* hufftree){//ADD:  const char* pathname
+void buildCBook(struct HeapNode* hufftree){//ADD:  char* pathname
 		int fd=open("./HuffmanCodebook", O_WRONLY | O_CREAT, 00644);
 		//traverse through Huffman tree (inorder), printing each time a leaf is found(i.e. leftchild/rightchild ==null or ig if name != NULL), print on each traversal downward.
 		if(write(fd, "^%\n", 3)!=3){
@@ -901,5 +883,14 @@ char* itoa(int num, char* str)
     } 
     str[i] = '\0'; 
     return str; 
+}
+void freeTree(struct HeapNode* head){
+	if(head==NULL){
+		return;
+	}
+	freeTree(head->left);
+	freeTree(head->right);
+	free(head->name);
+	free(head);
 }
 

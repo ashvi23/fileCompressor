@@ -34,20 +34,20 @@ struct HashNode* HashTable[10000];
 void error(int err);
 void deallocate(struct HashNode* head);
 //dirwalk
-void listdir(int flag, const char* dirname, const char* codebook);
+void listdir(int flag, char* dirname, const char* codebook);
 void openfiles(const char* filename);
 int is_directory(const char *dir);
 void writefiles(const char* filename);
 
 //compress
-char* getNextToken(char* filename, int size, int offset);
+char* getNextToken(const char* filename, int size, int offset);
 int compress(char* tocompress, char* codebook);
 char* retcode(char* tofind, char* codebook);
-int isFile(char *to_read) ;
+int isFile(const char *to_read) ;
 
 //decompress
 void decompress(char* codebook, char* decompressed);
-char* itoa(int num, char* str, int base) ;
+char* itoa(int num, char* str) ;
 
 //treefromcbook
 struct HeapNode* treeFromCBook(struct HeapNode* head, char* codebook);
@@ -56,24 +56,28 @@ struct HeapNode* insertEntry(struct HeapNode* head, char* directions, char* toke
 //hashmap.c
 struct HashNode* makeHashNode(char* string);
 int getKey(char* string);
-void addNode(struct HashNode** HashTable,char** string);//*
-int seek(struct HashNode** HashTable,char* string);
+void addNode(char** string);//*
+int seek(char* string);
 void deallocate(struct HashNode* head);
 
 //buildhtree
 struct HeapNode* makeTree(struct HeapNode* head, struct HeapNode* smaller, struct HeapNode* larger, int* count);
-struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHead, int numToks);
+struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHead);
 struct LLNode* makeNode(struct LLNode* newNode, struct HeapNode* tree);
 struct HeapNode* makeHeapNode(struct HeapNode* node, int freq, char* token);
-void delete(struct LLNode **head, char* Name);
+void deleteLL(struct LLNode **head, char* Name);
 void insert(struct LLNode **head, struct HeapNode **tree, int freq);
 //void freeNodes(struct LLNode *head);
 void freeTree(struct HeapNode* headTree);
 void printTree(struct HeapNode* node);
 void printLL(struct LLNode *head);
+void traverseTree(struct HeapNode* root,char path[], int index, int filedesc, int dir);
+void buildCBook(struct HeapNode* hufftree);
+
 
 //heapsort
 void swap(struct HeapNode** arr, int size, int largest);
 void heapify(struct HeapNode** arr, int size, int i);
-struct HeapNode* hashToArr(struct HashNode** HashTable, int numToks);
+struct HeapNode* hashToArr();
+void build(const char* filename);
 

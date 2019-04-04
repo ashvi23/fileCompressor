@@ -59,7 +59,7 @@ printf("warning: a file is sent to recurse\n");
       printf("build\n");
                 	build(1, dirname);
                 }
-                else if(flag == 2){
+            else if(flag == 2){
               //    printf("compre build\n");
 			compress(dirname, codebook);
 		}

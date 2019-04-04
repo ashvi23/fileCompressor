@@ -152,7 +152,6 @@ else {
         }
 	
     }
-    printHash();
     if (flag == 1){
 	printf("hello outside\n");
 		struct HeapNode* sortedHeapHead=NULL;
@@ -161,7 +160,7 @@ else {
 		printf("4 hello outside\n");
 		struct HeapNode *treehead = buildhTree(sortedHeapHead, treehead);
 		printf("1 hello outside\n");
-		buildCBook(treehead); 
+		buildCBook(treehead, dirname); 
 		printf("2 hello outside\n"); 
 	}
     closedir(currdir);
@@ -567,7 +566,7 @@ void build(int isfile, const char* filename){ //FOR TESTING PURPOSES ONLY
 		
 		printTree(treehead);
 		
-		buildCBook(treehead);
+		buildCBook(treehead, filename);
 
 		//deallocate(sortedHeapHead); 
 		}
@@ -1157,8 +1156,12 @@ struct HeapNode* makeHeapNode(struct HeapNode* node, int freq, char* token){
 	return node;
 }
 
-void buildCBook(struct HeapNode* hufftree){//ADD:  char* pathname
-		int fd=open("./HuffmanCodebook", O_WRONLY | O_CREAT, 00644);
+void buildCBook(struct HeapNode* hufftree, char* filename){//ADD:  char* pathname
+		char* huffmanpath = (char*) malloc(strlen(filename)+17);
+		huffmanpath[0] = '\0';
+		strcpy(huffmanpath, filename);
+		strcat(huffmanpath, "/HuffmanCodebook");
+		int fd=open(huffmanpath, O_WRONLY | O_CREAT, 00644);
 		//traverse through Huffman tree (inorder), printing each time a leaf is found(i.e. leftchild/rightchild ==null or ig if name != NULL), print on each traversal downward.
 		if(write(fd, "^%\n", 3)!=3){
 				write(2,"There was an error writing to HuffmanCodebook\n", 47);

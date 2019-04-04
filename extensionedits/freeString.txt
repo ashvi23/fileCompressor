@@ -1,0 +1,9 @@
+void freeargpointer(char** array, int count)
+{
+    int i;
+
+    for ( i = 0; array[i]; i++ )
+        free( array[i] );
+
+    free( array );
+}

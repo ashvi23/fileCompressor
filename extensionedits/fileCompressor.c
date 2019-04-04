@@ -81,10 +81,7 @@ int main(int argc, char** argv){
 		}
 		if ((strcmp(argv[1], "-R")==0 && strcmp(argv[2], "-c")==0 )|| (strcmp(argv[1], "-c")==0 && strcmp(argv[2], "-R")==0)){
 			if((is_directory(argv[3]) || isFile(argv[3])) &&  isFile(argv[4])){
-				if(strcmp(argv[4], "HuffmanCodeBook")!=0){
-					printf("Error: Must include a Huffman Codebook\n");
-					return 0;
-					}
+				
 				listdir(2, argv[3], argv[4], argv[3]);
 			}
 			else{
@@ -94,10 +91,7 @@ int main(int argc, char** argv){
 		}
 		else if ((strcmp(argv[1], "-R")==0 && strcmp(argv[2], "-d")==0 )|| (strcmp(argv[1], "-d")==0 && strcmp(argv[2], "-R")==0)){
 			if((is_directory(argv[3])||isFile(argv[3])) && isFile(argv[4])){
-					if(strcmp(argv[4], "HuffmanCodeBook")!=0){
-					printf("Error: Must include a Huffman Codebook\n");
-					return 0;
-					}
+					
 				listdir(3, argv[3], argv[4],argv[3]);
 			}
 			else{
@@ -251,31 +245,91 @@ struct HeapNode* treeFromCBook(struct HeapNode* head, char* codebook){
     int size=lseek(cb, 0, SEEK_END);//find the size of the file
     int l= lseek(cb, 0, SEEK_SET);
     char* buffer = (char*) malloc(size);
-    read(cb, buffer,size);
-    free(buffer);
-    int t= lseek(cb, 0, SEEK_SET);
+    //read(cb, buffer,size);
+    //printf("buf: %s\n", buffer);
+    //free(buffer);
+    //int t= lseek(cb, 0, SEEK_SET);
     char* code;  // holds huffman code
     char* token; //holds word
     int codelength=0;
     int tokenlength=0;
     int codebookread=0;
 
+	char* key = (char*) malloc(3*sizeof(char));
 
-
-	char* key = getNextToken(codebook, size - codebookread , codebookread);
+	key = getNextToken(codebook, size - codebookread , codebookread);
+	//printf("KEY: %s\n", key);
 	codebookread = codebookread + (strlen(key));
 
 	while(codebookread<size){
 		//get bitcode
 		code = getNextToken(codebook, size - codebookread , codebookread);
-        codelength = strlen(code);
+		codelength = strlen(code);
         codebookread = codebookread + codelength;
-
+		if(code[0] == '^' && code[1]== '%'){
+        	if(code[3] == 'w'){
+        	code =" ";
+        	}
+        	else if(code[3] == 't'){
+        	code ="\t";
+        	}
+        	else if(code[3] == 'n'){
+        	code ="\n";
+        	}
+        	else if(code[3] == '0'){
+        	code ="\0";
+        	}
+        	else if(code[3] == 'v'){
+        	code ="\v";
+        	}
+        	else if(code[3] == 'f'){
+        	code ="\f";
+        	}
+        	else if(code[3] == 'r'){
+        	code ="\r";
+        	}
+        	else if(code[3] == 'a'){
+        	code ="\a";
+        	}
+        	else if(code[3] == 'b'){
+        	code ="\b";
+        	}
+        	
+        }
 		//get token
 		token = getNextToken( codebook,  size - codebookread, codebookread);    
         tokenlength = strlen(token);
         codebookread = codebookread+tokenlength;
-
+		if(token[0] == '^' && token[1]== '%'){
+        	if(token[3] == 'w'){
+        	code =" ";
+        	}
+        	else if(token[3] == 't'){
+        	token ="\t";
+        	}
+        	else if(token[3] == 'n'){
+        	token ="\n";
+        	}
+        	else if(token[3] == '0'){
+        	token ="\0";
+        	}
+        	else if(token[3] == 'v'){
+        	token ="\v";
+        	}
+        	else if(token[3] == 'f'){
+        	token ="\f";
+        	}
+        	else if(token[3] == 'r'){
+        	token ="\r";
+        	}
+        	else if(token[3] == 'a'){
+        	token ="\a";
+        	}
+        	else if(token[3] == 'b'){
+        	token ="\b";
+        	}
+        	
+        }
 		//delete delimeter
 		if(iscntrl(code[codelength-1]) >0){
 			code[codelength-1] = '\0';
@@ -287,8 +341,10 @@ struct HeapNode* treeFromCBook(struct HeapNode* head, char* codebook){
 		//insertheapnode
 		head = insertEntry(head, code, token, 0);
 	}
+	//printTree(head);//DELETE ME
 	return head;
 }
+
 
 struct HeapNode* insertEntry(struct HeapNode* head, char* directions, char* token, int index){	
 	if(head==NULL){

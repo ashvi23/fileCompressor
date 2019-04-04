@@ -13,7 +13,6 @@ int numToks;
 struct HashNode* HashTable[10000];
 
 int main(int argc, char** argv){
-	printf("please do this");
 	if(argc <3 || argc>5){
 		printf("Not enough arguments\n");
 		return 0;
@@ -139,7 +138,6 @@ int isFile(const char *to_read) {
 }
 
 int is_directory(const char *directory) {
-printf("path2: %s\n", directory);
     DIR *direc = opendir(directory);
     if (direc) {
         closedir(direc);
@@ -206,18 +204,13 @@ void decompress(char* compressed, char* codebook){
 		if(ptr==NULL){
 			printf("invalid data in compressed file\n");
 			ptr=head;//reset
-			//return; // ??????
 		}
 		if(ptr->left!=NULL || ptr->right!=NULL){
-		//int val = atoi(ptr->name);
-			//printf("ptrname:[%s]  buffer[0]:[%c]\n", ptr->name, buffer[0]);
 			if(buffer[0]=='0' ){
-				//printf("left\n");
 				ptr=ptr->left;
 				
 			}
 			else if(buffer[0]=='1' ){
-				//printf("right\n");
 				
 				ptr=ptr->right;
 				
@@ -226,7 +219,7 @@ void decompress(char* compressed, char* codebook){
 			break;
 			}
 			else if (buffer[0]!='1' && buffer[0]!='0' && bytesread<sizec){
-				printf("BUFFER: %c\n", buffer[0]);
+				
 				printf("Error in Decompress:Compressed file contained a non 1 or 0 number \n");
 			return;
 			}
@@ -322,28 +315,22 @@ struct HeapNode* insertEntry(struct HeapNode* head, char* directions, char* toke
 
 //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 void listdir(int flag, const char* dirname, const char* codebook, const char* parentdir){
-//printf("");
 //given a file path not a directory 
 if(isFile(dirname)){
 printf("warning: a file is sent to recurse\n");
       if(flag ==1){
-      printf("build\n");
                 	build(1, dirname, parentdir);
                 }
             else if(flag == 2){
-              //    printf("compre build\n");
 			compress(dirname, codebook);
 		}
 		else if(flag == 3){
-		 // printf("decompr\n");
 			//decompress(dirname, codebook);
 		}
 		return;
 }
 else {
-//printf("in here!\n");
 	DIR* currdir = opendir(dirname);
-	printf("path: %s\n", dirname);
     struct dirent *dir_info;
     if(currdir==NULL){
         printf("Error: Cannot open directory\n");
@@ -382,7 +369,7 @@ else {
             
             //is directory
             else if(dir_info->d_type == DT_DIR){
-            printf("path %s\n", path);
+    
                 listdir(flag, path, codebook, parentdir);
             }
             
@@ -402,7 +389,6 @@ else {
 					compress(path, codebook);
 				}
 				else if(flag == 3){
-				  printf("decompr\n");
 				 
 					//decompress(path, codebook);
 				}
@@ -457,7 +443,6 @@ char* getNextToken( char* filename, int size, int offset){
        }
        else{
        	tokensize = sizeof(token);
-        //printf("size of token:%d\n", tokensize);
         char* temp = (char*) realloc(token , (tokensize+10) * sizeof(char) );
         if(temp ==NULL){
             printf("Error: Cannot malloc space for token\n");
@@ -644,7 +629,6 @@ if(iscntrl(tofind[0]) >0 || tofind[0] == ' '){
         code = getNextToken(codebook, size - codebookread , codebookread);
         codelength = strlen(code);
         codebookread = codebookread + codelength;
-        //printf("RC code:[%s]\n",code);
 
         if(strcmp(code, "3")==0){
             printf("Error: Could not retrieve code in HuffmanCodebook at offset:%d \n", codebookread);
@@ -709,7 +693,6 @@ if(iscntrl(tofind[0]) >0 || tofind[0] == ' '){
 //end of build codebook methods
 void build(int isfile, const char* filename, char* parentdir){//NLY
 	// get size of file, getnexttoken, send into hashmap 
-	printf("in build! is file: %d, path:%s\n", isfile, filename);
 	struct HeapNode *treehead  = NULL;
 	
 	if(isFile(filename) ==1){
@@ -772,11 +755,7 @@ void build(int isfile, const char* filename, char* parentdir){//NLY
         if(isfile ==1 ){
         struct HeapNode* sortedHeapHead=NULL;
 		sortedHeapHead= hashToArr();
-		printTree(sortedHeapHead);
 		treehead = buildhTree(sortedHeapHead, treehead);
-
-		
-		printTree(treehead);
 		
 		buildCBook(treehead, filename, parentdir);
 		}
@@ -1030,24 +1009,17 @@ struct HeapNode* buildhTree(struct HeapNode* sortedArr, struct HeapNode* heapHea
 
 		}
 		
-		printf("\nDONE\n");
 	}
-	printTree(LLptr->Tree);
 	return LLptr->Tree;
 }
 
 void printTree(struct HeapNode* node){
 
 	 if (node == NULL) {
-    printf("null in print\n");
           return; 
    }
-   if(node!= NULL){
-   	printf("head: [%s] \n  ",node->name );
-     }
-     printTree(node->left); 
- 
-  
+   
+     printTree(node->left);
      /* now recur on right child */
      printTree(node->right); 
 }
@@ -1151,7 +1123,6 @@ struct LLNode *node= NULL;
 void deleteLL(struct LLNode **head, char* Name){
 	struct LLNode *temp1=(*head);
 		if((*head)==NULL){
-			//printf("hello 2!\n");
 			return;
 		}
 		else if((*head)->next==NULL && strcmp((*head)->Tree->name,Name)==0){
@@ -1257,11 +1228,29 @@ struct HeapNode* makeHeapNode(struct HeapNode* node, int freq, char* token){
 void buildCBook(struct HeapNode* hufftree, char* filename, char* parentdir){//ADD:  char* pathname %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		char* huffmanpath = (char*) malloc(strlen(filename)+17);
 		huffmanpath[0] = '\0';
+	if(is_directory(filename)){
 		strcpy(huffmanpath, filename);
 		strcat(huffmanpath, "/HuffmanCodebook");
+		}
+		else{
+			int filenamelen=strlen(filename);
+			int f;
+			int index=0;
+			for(f=0; f<filenamelen; f++){
+				if(filename[f]=='/'){
+				index=f;
+				}
+				
+			}
+			int deleteLen=filenamelen-(filenamelen-index);
+			memcpy(huffmanpath, filename, deleteLen);
+			
+			strcat(huffmanpath, "/HuffmanCodebook");
+		}
 		int fd=open(huffmanpath, O_WRONLY | O_CREAT, 00644);
 		//traverse through Huffman tree (inorder), printing each time a leaf is found(i.e. leftchild/rightchild ==null or ig if name != NULL), print on each traversal downward.
 		if(write(fd, "^%\n", 3)!=3){
+
 				write(2,"There was an error writing to HuffmanCodebook\n", 47);
 			} 
 		int pathArrSize=hufftree->height;
@@ -1398,3 +1387,4 @@ void freeTree(struct HeapNode* head){
 	free(head->name);
 	free(head);
 }
+

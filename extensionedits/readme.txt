@@ -7,7 +7,7 @@ Overall Algorithm:
 
 
 Recursion:
-	Takes in flags as an int representation (1=b, 2=c, 3=d). Opens the directory path if it was a valid path to a directory. The program traverses through each file/folder in the directory and that level and concatnates the directory name to a string called path. There is a while loop inside the method, that searches thorugh the directory given (while readdir). When a directory is found, a recursive call is made by sending in that directory. When a file is reached, the path that is created for that file is passed in as a parameter to the given flag's function. 
+	Takes in flags as an int representation (1=b, 2=c, 3=d). Opens the directory path if it was a valid path to a directory. The program traverses through each file/folder in the directory and that level and concatnates the directory name to a string called path. When a directory is found, a recursive call is made by sending in that directory. When a file is reached, the path that is created for that file is passed in as a parameter to the given flag's function. 
 	
 Build Code Book:
 	Structures Used:
@@ -21,13 +21,14 @@ Build Code Book:
 
 	Algorithm:
 		1. Store tokens and frequencies
-			Parse the file using getNextToken and insert each token into a hashtable 
+			Parse the file using getNextToken and insert each token into a hashtable .
 
 		2. Build Minheap Array
+			Create minheap out of array of all tokens+their frequencies, heapifying each time you do so, until entire array is sorted.
+
 
 		3. Build Huffman Tree
-			
-
+			Take minheap array, combine two lowest values in array to make the first tree, create that as the first node in a linked list that stores all currently created trees. During traversal of the inheap/Huffman tree LL, all new trees are inserted into LL using insertion sort, so that the first node is guaranteed to be the smallest value present among all of the trees. Compare between smallest values in minheap and Huffman tree LL until there are no more unread indices in the array, and only one tree in the linked list. Smallest value is stored to the left, largest to the right. The head of each tree created is named by the order of insertion, so that each tree has a parent with a unique name.
 		4. Build Codebook 
 			Traverse through the huffman tree, using an int array to store all of the directions taken thus far (in 1/0s), when a leaf node is reached, the full contents of the array is written to the codebook file, plus a tab, the token, and then  a newline. Because recursion is used, each time the function returns to a previous call, it also returns to a prior index in the int array, so that the index of the values written in to the array correspond to the level of the tree that is being traversed.
 
@@ -64,13 +65,7 @@ Time Complexity: (t is the number of tokens in the file mentioned)
 			Searching the tree: t*
 			Writing decompressed file: O(t)
 	Recurse:
-		d - # of directories(dt_reg + dt_dir)
-			while loop: O(d)
-				- goes through all of the directories(dt_reg + dt_dir) in a folder
-			recursive call
-			if dt_reg
-				O() of the function that is being called (O(compress), O(decompress) O(buildCodebook))
-		
+			
 
 Space Complexity: (t is the number of tokens in the file entered)
 	Hashtable: Static array of size 10000, with t many nodes hanging off of it.
